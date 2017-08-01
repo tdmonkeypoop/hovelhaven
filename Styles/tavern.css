@@ -1,0 +1,194 @@
+.subitem{
+    vertical-align: middle;
+}
+
+
+body{
+    color: white;
+    text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+    background-color: #ededed;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 12% auto 15%;
+    grid-template-rows: 8% 5% auto 5%;
+    grid-tempate-areas:
+        "logo"
+        "header"
+        "tabs"
+        "dead-space"
+        "summary"
+        "main"
+        "footer";
+    height:100%;
+}
+
+.container{
+    grid-template-areas:
+        "logo header header"
+        "logo tabs dead-space"
+        "summary main dead-space"
+        "footer footer footer";
+    border: black 1px;
+}
+
+.logo {
+    grid-area: logo;
+    background-color: darkgray;
+}
+
+
+.header {
+    grid-area: header;
+    background-color: #95bdf9;
+    font-size: 250%;
+}
+
+.tabs {
+    grid-area: tabs;
+    background-color: #ededed;
+    
+}
+
+.dead-space{
+    grid-area: dead-space;
+    background-color: #ededed;
+}
+
+.main {
+    grid-area: main;
+    background-color: #ededed;
+    overflow-y: auto;
+    border: 1px black solid;
+}
+
+.summary {
+    grid-area: summary;
+    bacground-color: gray;
+    overflow-y: auto;
+}
+
+.footer {
+    grid-area: footer;
+    background-color: gray;
+    padding-right: 30px;
+}
+
+.centered {
+    justify-self: center;
+}
+
+.middled {
+    align-self: center;
+}
+
+.bottomed {
+    align-self: end;
+}
+
+.justify-right{
+    justify-self: end;
+    text-align: right;
+}
+
+.summary-item {
+    padding: 10px;
+    margin: 5px;
+    background-color: #99dae5;
+    border: 3px solid #99dae5;
+    border-radius: 5px;
+    height: 30px;
+}
+
+.tab-item {
+    text-align: center;
+    font-size: 120%;
+    line-height: 2;
+    background-color: gray;
+    width: 16%;
+    display: inline-block;
+    border-top: 10px;
+    border-radius: 10px;
+    height: 30px;
+}
+
+.card-container{
+    display: grid;
+    grid-template-columns: 4% 20% 4% 20% 4% 20% 4% 20% 4%;
+    grid-template-rows: 5% auto 5%;
+    grid-tempate-areas:
+        "summary-card-title"
+        "prices-card-title"
+        "expenses-card-title"
+        "ledger-card-title"
+        "summary-card"
+        "prices-card"
+        "expenses-card"
+        "ledger-card";
+    height:100%;
+}
+
+.card-container{
+    grid-template-areas:
+        ". summary-card-title. prices-card-title . expenses-card-title . ledger-card-title ."
+        ". summary-card      . prices-card       . expenses-card       . ledger-card       ."
+        ". summary-card-total. prices-card-total . expenses-card-total . start-next-day    .";
+    border: black 1px;
+}
+
+.card-title{
+    background-color: #bcbcbc;
+    color: black;
+    text-shadow: none;
+}
+
+.card{
+    background-color: #ededed;
+    color: black;
+    text-shadow: none;
+}
+
+.card-total{
+    background-color: #bcbcbc;
+    color: black;
+    text-shadow: none;
+}
+
+.summary-card-title{
+    grid-area: summary-card-title;
+}
+.prices-card-title {
+    grid-area: prices-card-title;
+}
+.expenses-card-title {
+    grid-area: expenses-card-title;
+}
+.ledger-card-title {
+    grid-area: ledger-card-title;
+}
+.summary-card {
+    grid-area: summary-card;
+}
+.prices-card {
+    grid-area: prices-card;
+}
+.expenses-card {
+    grid-area: expenses-card;
+}
+.ledger-card {
+    grid-area: ledger-card;
+}
+
+.summary-card-total{
+    grid-area: summary-card-total;
+}
+.prices-card-total {
+    grid-area: prices-card-total;
+}
+.expenses-card-total {
+    grid-area: expenses-card-total;
+}
+.start-next-day {
+    grid-area: start-next-day;
+}

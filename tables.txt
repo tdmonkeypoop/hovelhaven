@@ -1,0 +1,43 @@
+CREATE TABLE users (id INT AUTO_INCREMENT PRIMARY KEY NOT NULL, username TEXT NOT NULL, password TEXT NOT NULL, gameid INT);
+Users
+    id
+    username
+    password
+    gameid
+
+CREATE TABLE ledgers (gameid INT, date TEXT NOT NULL, itemid INT NOT NULL, sold BOOL NOT NULL, qty INT NOT NULL);
+ledgers
+    gameid
+    date
+    itemid
+    sold
+    qty
+
+CREATE TABLE games (gameid INT PRIMARY KEY AUTO_INCREMENT, userid INT NOT NULL, currentdate TEXT NOT NULL, currentmoney DECIMAL(11, 2), mug_ale INT, glass_wine INT, common_meal INT, fine_meal INT, chicken INT, pork_chop INT, carrot INT, potato INT, barrel_wine INT, keg_ale INT, full_chicken INT, pig INT, carrot_bag INT, potato_sack INT);
+games
+    gameid
+    userid
+    currentdate
+    currentmoney
+    mug_ale
+    glass_wine
+    common_meal
+    fine_meal
+    chicken
+    pork_chop
+    carrot
+    potato
+    barrel_wine
+    keg_ale
+    full_chicken
+    pig
+    carrot_bag
+    potato_sack
+    
+    
+CREATE TABLE items (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, cost DECIMAL(6,2) NOT NULL, qty INT)
+items
+    id
+    name
+    cost
+    qty
