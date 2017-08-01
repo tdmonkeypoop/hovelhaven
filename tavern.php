@@ -57,7 +57,8 @@
 	        <div class="tab-item centered middled">Customers (Soon)</div>
 	    </div>
 	    
-	    <div class="main card-container">
+	    <form class="main card-container" action="/Scripts/end-turn.php" method="POST">
+	    <!--<div class="main card-container">-->
 	    	<!--Backgrounds-->
 	    	<div class="summary-card-title card-title"></div>
 	    	<div class="prices-card-title card-title"></div>
@@ -74,43 +75,55 @@
 	    	
 	    	<!--Content-->
 	    	<!--Titles-->
-	    		<div class="summary-card-title card-title middled centered">SUMMARY</div>
-	    		<div class="prices-card-title card-title middled centered">PRICES</div>
-	    		<div class="expenses-card-title card-title middled centered">Inventory</div>
-	    		<div class="ledger-card-title card-title middled centered">LEDGER</div>
+    		<div class="summary-card-title card-title middled centered">SUMMARY</div>
+    		<div class="prices-card-title card-title middled centered">PRICES</div>
+    		<div class="expenses-card-title card-title middled centered">Inventory</div>
+    		<div class="ledger-card-title card-title middled centered">LEDGER</div>
 	    	<!--Cards-->
-		    	<div class="summary-card card">
-		    		Current Day: <?=FormatDate($currentGame["currentdate"])?><br>
-		    		Total Cash: $<?=$currentGame["currentmoney"]?><br>
-		    	</div>
-		    	<div class="prices-card card">
-				
-		    	</div>
-		    	<div class="expenses-card card">
-		    		Mugs of Ale: <?=$currentGame["mug_ale"]?><br>
-		    		Glasses of Wine: <?=$currentGame["glass_wine"]?><br>
-		    		Common Meals: <?=$currentGame["common_meal"]?><br>
-		    		Fine Meals: <?=$currentGame["fine_meal"]?><br>
-		    		Poultry: <?=$currentGame["chicken"]?><br>
-		    		Pork Chops: <?=$currentGame["pork_chop"]?><br>
-		    		Carrots: <?=$currentGame["carrot"]?><br>
-		    		Potatos: <?=$currentGame["potato"]?><br>
-		    		Barrels of Wine: <?=$currentGame["barrel_wine"]?><br>
-		    		Kegs of Ale: <?=$currentGame["keg_ale"]?><br>
-		    		Full Chickens: <?=$currentGame["full_chicken"]?><br>
-		    		Pigs: <?=$currentGame["pig"]?><br>
-		    		Carrot Bags: <?=$currentGame["carrot_bag"]?><br>
-		    		Potato Sacks: <?=$currentGame["potato_sack"]?><br>
-		    	</div>
-		    	<div class="ledger-card card">
-		    	</div>
+	    	<div class="summary-card card">
+	    		Current Day: <?=FormatDate($currentGame["currentdate"])?><br>
+	    		Total Cash: $<?=$currentGame["currentmoney"]?><br>
+	    	</div>
+	    	<div class="prices-card card">
+			<label>Mug of Ale: $</label><input type="text" style="width:40px; float:right" placeholder="0.00" name="aleprice"><br><br>
+			<label>Glass of Wine: $</label><input type="text" style="width:40px; float:right" placeholder="0.00" name="wineprice"><br><br>
+			<label>Common Meal: $</label><input type="text" style="width:40px; float:right" placeholder="0.00" name="commonmealprice"><br><br>
+			<label>Fine Meal: $</label><input type="text" style="width:40px; float:right" placeholder="0.00" name="finemealprice"><br><br>
+			<br><br>
+			&lt;-- ORDER --><br><br>
+			<label>Keg of Ale: $<?= GetItemCostByName("keg_ale") ?></label><input type="text" style="width:40px; float:right" placeholder="0" name="orderale"><br><br>
+			<label>Barrel of Wine: $<?= GetItemCostByName("barrel_wine") ?> </label><input type="text" style="width:40px; float:right" placeholder="0" name="orderwine"><br><br>
+			<label>Full Chicken: $<?= GetItemCostByName("full_chicken") ?></label><input type="text" style="width:40px; float:right" placeholder="0" name="orderchicken"><br><br>
+			<label>Pig: $<?= GetItemCostByName("pig") ?></label><input type="text" style="width:40px; float:right" placeholder="0" name="orderpig"><br><br>
+			<label>Bag of Carrots: $<?= GetItemCostByName("carrot_bag") ?></label><input type="text" style="width:40px; float:right" placeholder="0" name="ordercarrot"><br><br>
+			<label>Sack of Potatos: $<?= GetItemCostByName("potato_sack") ?> </label><input type="text" style="width:40px; float:right" placeholder="0" name="orderpotatos"><br><br>
+	    	</div>
+	    	<div class="expenses-card card">
+	    		Mugs of Ale: <?=$currentGame["mug_ale"]?><br>
+	    		Glasses of Wine: <?=$currentGame["glass_wine"]?><br>
+	    		Common Meals: <?=$currentGame["common_meal"]?><br>
+	    		Fine Meals: <?=$currentGame["fine_meal"]?><br>
+	    		Poultry: <?=$currentGame["chicken"]?><br>
+	    		Pork Chops: <?=$currentGame["pork_chop"]?><br>
+	    		Carrots: <?=$currentGame["carrot"]?><br>
+	    		Potatos: <?=$currentGame["potato"]?><br>
+	    		Barrels of Wine: <?=$currentGame["barrel_wine"]?><br>
+	    		Kegs of Ale: <?=$currentGame["keg_ale"]?><br>
+	    		Full Chickens: <?=$currentGame["full_chicken"]?><br>
+	    		Pigs: <?=$currentGame["pig"]?><br>
+	    		Carrot Bags: <?=$currentGame["carrot_bag"]?><br>
+	    		Potato Sacks: <?=$currentGame["potato_sack"]?><br><br>
+	    	</div>
+	    	<div class="ledger-card card">
+	    		
+	    	</div>
 		    <!--Totals-->
-		    	<div class="summary-card-total card-total middled justify-right"></div>
-		    	<div class="prices-card-total card-total middled justify-right"></div>
-		    	<div class="expenses-card-total card-total middled justify-right"></div>
-		    	<a href="/Scripts/end-turn.php" class="start-next-day"><div class="start-next-day card-total card middled centered">End Day</div></a>
-	    </div>
+	    	<div class="summary-card-total card-total middled justify-right"></div>
+	    	<div class="prices-card-total card-total middled justify-right"></div>
+	    	<div class="expenses-card-total card-total middled justify-right"></div>
+	    	<div class="start-next-day card-total card middled centered"><button type="submit">End Day</button></div>
 	    
+	    </form>
 	    <div class="footer justify-right middled">Contact Us... But Don't Really we don't care. - No Really We Don't Care</div>
 	</body>
 </html>

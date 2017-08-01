@@ -169,3 +169,15 @@
 		
 		return "Day " . (int)$numberOfDays . " of Month " . (int)$numberOfMonths . " of Year " . (int)$numberOfYears;
 	}
+	
+	function GetItemCostByName($name)
+	{
+		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		
+		$sql = "SELECT cost FROM items WHERE name = '$name'";
+		$result = $conn->query($sql);
+
+		$row = $result->fetch_assoc();
+		
+		return $row["cost"];
+	}
