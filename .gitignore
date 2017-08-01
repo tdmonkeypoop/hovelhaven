@@ -39,3 +39,7 @@ Scripts/config.php
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# C9 Stuff #
+############
+.c9/
