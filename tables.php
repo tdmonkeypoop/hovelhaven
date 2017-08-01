@@ -67,3 +67,31 @@
             cost
             qty
     */
+    $sql = "INSERT INTO items VALUES(1, 'mug_ale', 0.04, 1)";
+    $conn->query($sql);
+    $sql = "INSERT INTO items VALUES(2, 'glass_wine', 0.20, 1)";
+    $conn->query($sql);
+    $sql = "INSERT INTO items VALUES(3, 'common_meal', 0.30, 1)";
+    $conn->query($sql);
+    $sql = "INSERT INTO items VALUES(4, 'fine_meal', 0.70, 1)";
+    $conn->query($sql);
+    $sql = "INSERT INTO items VALUES(5, 'chicken', 0.20, 1)";
+    $conn->query($sql);
+    $sql = "INSERT INTO items VALUES(6, 'pork_chop', 0.3, 1)";
+    $conn->query($sql);
+    $sql = "INSERT INTO items VALUES(7, 'carrot', 0.05, 1)";
+    $conn->query($sql);
+    $sql = "INSERT INTO items VALUES(8, 'potato', 0.03, 1)";
+    $conn->query($sql);
+    $sql = "INSERT INTO items VALUES(9, 'barrel_wine', 5.00, 200)";
+    $conn->query($sql);
+    $sql = "INSERT INTO items VALUES(10, 'keg_ale', 10, 100)";
+    $conn->query($sql);
+    $sql = "INSERT INTO items VALUES(11, 'full_chicken', 1, 4)";
+    $conn->query($sql);
+    $sql = "INSERT INTO items VALUES(12, 'pig', 3.1, 8)";
+    $conn->query($sql);
+    $sql = "INSERT INTO items VALUES(13, 'carrot_bag', 1, 12)";
+    $conn->query($sql);
+    $sql = "INSERT INTO items VALUES(14, 'potato_sack', 1, 20)";
+    $conn->query($sql);
