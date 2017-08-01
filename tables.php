@@ -33,7 +33,7 @@
             qty
     */
 
-    $sql = "CREATE TABLE games (gameid INT PRIMARY KEY AUTO_INCREMENT, userid INT NOT NULL, currentdate INT NOT NULL, currentmoney DECIMAL(11, 2), mug_ale INT, glass_wine INT, common_meal INT, fine_meal INT, chicken INT, pork_chop INT, carrot INT, potato INT, barrel_wine INT, keg_ale INT, full_chicken INT, pig INT, carrot_bag INT, potato_sack INT)";
+    $sql = "CREATE TABLE games (gameid INT PRIMARY KEY AUTO_INCREMENT, userid INT NOT NULL, currentdate INT NOT NULL, currentmoney DECIMAL(11, 2), mug_ale INT, glass_wine INT, common_meal INT, fine_meal INT, chicken INT, pork_chop INT, carrot INT, potato INT, barrel_wine INT, keg_ale INT, full_chicken INT, pig INT, carrot_bag INT, potato_sack INT, ale_price DECIMAL(6,2), wine_price DECIMAL(6,2), common_meal_price DECIMAL(6,2), fine_meal_price DECIMAL(6,2))";
     $conn->query($sql);
     /*
         games
@@ -55,6 +55,10 @@
             pig
             carrot_bag
             potato_sack
+            ale_price
+            wine_price
+            common_meal_price
+            fine_meal_price
     */
     
     $sql = "CREATE TABLE items (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, cost DECIMAL(6,2) NOT NULL, qty INT)";

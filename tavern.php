@@ -85,10 +85,10 @@
 	    		Total Cash: $<?=$currentGame["currentmoney"]?><br>
 	    	</div>
 	    	<div class="prices-card card">
-			<label>Mug of Ale: $</label><input type="text" style="width:40px; float:right" placeholder="0.00" name="aleprice"><br><br>
-			<label>Glass of Wine: $</label><input type="text" style="width:40px; float:right" placeholder="0.00" name="wineprice"><br><br>
-			<label>Common Meal: $</label><input type="text" style="width:40px; float:right" placeholder="0.00" name="commonmealprice"><br><br>
-			<label>Fine Meal: $</label><input type="text" style="width:40px; float:right" placeholder="0.00" name="finemealprice"><br><br>
+			<label>Mug of Ale: $<?= $currentGame["ale_price"]?> New:$</label><input type="text" style="width:40px; float:right" placeholder="<?= $currentGame["ale_price"]?>" name="aleprice"><br><br>
+			<label>Glass of Wine: $<?= $currentGame["wine_price"]?> New:$</label><input type="text" style="width:40px; float:right" placeholder="<?= $currentGame["wine_price"]?>" name="wineprice"><br><br>
+			<label>Common Meal: $<?= $currentGame["common_meal_price"]?> New:$</label><input type="text" style="width:40px; float:right" placeholder="<?= $currentGame["common_meal_price"]?>" name="commonmealprice"><br><br>
+			<label>Fine Meal: $<?= $currentGame["fine_meal_price"]?> New:$</label><input type="text" style="width:40px; float:right" placeholder="<?= $currentGame["fine_meal_price"]?>" name="finemealprice"><br><br>
 			<br><br>
 			&lt;-- ORDER --><br><br>
 			<label>Keg of Ale: $<?= GetItemCostByName("keg_ale") ?></label><input type="text" style="width:40px; float:right" placeholder="0" name="orderale"><br><br>
@@ -96,7 +96,7 @@
 			<label>Full Chicken: $<?= GetItemCostByName("full_chicken") ?></label><input type="text" style="width:40px; float:right" placeholder="0" name="orderchicken"><br><br>
 			<label>Pig: $<?= GetItemCostByName("pig") ?></label><input type="text" style="width:40px; float:right" placeholder="0" name="orderpig"><br><br>
 			<label>Bag of Carrots: $<?= GetItemCostByName("carrot_bag") ?></label><input type="text" style="width:40px; float:right" placeholder="0" name="ordercarrot"><br><br>
-			<label>Sack of Potatos: $<?= GetItemCostByName("potato_sack") ?> </label><input type="text" style="width:40px; float:right" placeholder="0" name="orderpotatos"><br><br>
+			<label>Sack of Potatos: $<?= GetItemCostByName("potato_sack") ?> </label><input type="text" style="width:40px; float:right" placeholder="0" name="orderpotato"><br><br>
 	    	</div>
 	    	<div class="expenses-card card">
 	    		Mugs of Ale: <?=$currentGame["mug_ale"]?><br>
