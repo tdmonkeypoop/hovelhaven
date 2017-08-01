@@ -117,7 +117,7 @@
 	{
 	    $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
 
-		$sql = "INSERT INTO games (userid, currentdate, currentmoney, mug_ale, glass_wine, common_meal, fine_meal, chicken, pork_chop, carrot, potato, barrel_wine, keg_ale, full_chicken, pig, carrot_bag, potato_sack) values ('$userId', '0y12m30d', 10.00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)";
+		$sql = "INSERT INTO games (userid, currentdate, currentmoney, mug_ale, glass_wine, common_meal, fine_meal, chicken, pork_chop, carrot, potato, barrel_wine, keg_ale, full_chicken, pig, carrot_bag, potato_sack) values ('$userId', 0, 10.00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)";
 		$conn->query($sql);
 		
 		$sql = "SELECT gameid FROM games where userid = '$userId'";

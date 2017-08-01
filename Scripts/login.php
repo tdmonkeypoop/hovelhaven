@@ -16,12 +16,12 @@
 	if (!ValidUsername($username))
 	{
 		$_SESSION["error"] = "Username is invalid; Must be at lease 2 characters!";
-		header("location: ../login.php");
+		header("location: ../index.php");
 	}
 	elseif (!ValidPassword($password))
 	{
 		$_SESSION["error"] = "Password is invalid; Must be at lease 2 characters!";
-		header("location: ../login.php");
+		header("location: ../index.php");
 	}
 	elseif (VerifyUser($username, $password))
 	{
@@ -31,5 +31,5 @@
 	else
 	{
 		$_SESSION["error"] = "Username/Password combo invalid!";
-		header("location: ../login.php");
+		header("location: ../index.php");
 	}
