@@ -22,15 +22,13 @@
             gameid
     */
 
-    $sql = "CREATE TABLE ledgers (gameid INT, date TEXT NOT NULL, itemid INT NOT NULL, sold BOOL NOT NULL, qty INT NOT NULL)";
+    $sql = "CREATE TABLE ledgers (gameid INT, date INT NOT NULL, record TEXT)";
     $conn->query($sql);
     /*
         ledgers
             gameid
             date
-            itemid
-            sold
-            qty
+            record
     */
 
     $sql = "CREATE TABLE games (gameid INT PRIMARY KEY AUTO_INCREMENT, userid INT NOT NULL, currentdate INT NOT NULL, currentmoney DECIMAL(11, 2), mug_ale INT, glass_wine INT, common_meal INT, fine_meal INT, chicken INT, pork_chop INT, carrot INT, potato INT, barrel_wine INT, keg_ale INT, full_chicken INT, pig INT, carrot_bag INT, potato_sack INT, ale_price DECIMAL(6,2), wine_price DECIMAL(6,2), common_meal_price DECIMAL(6,2), fine_meal_price DECIMAL(6,2))";
@@ -71,7 +69,7 @@
             cost
             qty
     */
-    $sql = "INSERT INTO items VALUES(1, 'mug_ale', 0.04, 1)";
+    $sql = "INSERT INTO items VALUES(1, 'mug_ale', 0.1, 1)";
     $conn->query($sql);
     $sql = "INSERT INTO items VALUES(2, 'glass_wine', 0.20, 1)";
     $conn->query($sql);
@@ -119,5 +117,6 @@
     $conn->query($sql);
     $sql = "INSERT INTO customers VALUES(2, 'wealthy', 1, 3, 5, 5, 1, 1)";
     $conn->query($sql);
-    $sql = "INSERT INTO customers VALUES(3, 'Drunk', 5, 1, 0, 0, 0, 0)";
+    $sql = "INSERT INTO customers VALUES(3, 'drunk', 5, 1, 0, 0, 0, 0)";
     $conn->query($sql);
+    

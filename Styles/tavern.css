@@ -59,7 +59,7 @@ body{
 .main {
     grid-area: main;
     background-color: #ededed;
-    overflow-y: auto;
+    overflow: hidden;
     border: 1px black solid;
 }
 
@@ -127,6 +127,7 @@ body{
         "expenses-card"
         "ledger-card";
     height:100%;
+    overflow: hidden;
 }
 
 .card-container{
@@ -178,6 +179,7 @@ body{
 }
 .ledger-card {
     grid-area: ledger-card;
+    overflow-y: scroll;
 }
 
 .summary-card-total{

@@ -64,27 +64,19 @@
 	if($newFineMealPrice > 0)
 		$currentGame["fine_meal_price"]=$newFineMealPrice;
 	
-	$currentGame = BuyOneOfEverything($currentGame);
-	$currentGame = ReceiveOrders($currentGame, $newAleOrder, $newWineOrder);
-	PickDaysCustomers();
-	UpdateCustomers();
-	CheckForShipments();
+	$currentGame = OpenCases($currentGame);
+	$currentGame = PickDaysCustomers($currentGame);
+	$currentGame = CheckForShipments($currentGame, $newAleOrder, $newWineOrder);
 	$currentGame = EndDay($currentGame);
 	
 	header("location: ../tavern.php");
 
-	function BuyOneOfEverything($currentGame)
+	function OpenCases($currentGame)
 	{
 		if($currentGame["mug_ale"] == 0 && $currentGame["keg_ale"] > 0)
 		{
 			$currentGame["keg_ale"]--;
 			$currentGame["mug_ale"] = GetItemQtyByName("keg_ale");
-		}
-		
-		if($currentGame["mug_ale"] > 0)
-		{
-			$currentGame["mug_ale"]--;
-			$currentGame["currentmoney"] += $currentGame["ale_price"];
 		}
 		
 		if($currentGame["glass_wine"] == 0 && $currentGame["barrel_wine"] > 0)
@@ -93,15 +85,99 @@
 			$currentGame["glass_wine"] = GetItemQtyByName("barrel_wine");
 		}
 		
-		if($currentGame["glass_wine"] > 0)
+		return $currentGame;
+	}
+
+	function PickDaysCustomers($currentGame)
+	{
+		$numberOfCustomers = rand(3, 10);
+		
+		$uniqueCustomers = GetCustomerTypes();
+		
+		for ($i = 0; $i < $numberOfCustomers; $i++)
 		{
-			$currentGame["glass_wine"]--;
-			$currentGame["currentmoney"] += $currentGame["wine_price"];
+			$customerId = rand(1, $uniqueCustomers);
+			
+			$customer = GetCustomerById($customerId);
+			$customerHappiness = rand (1, 10);
+			$customerStinginess = rand (1, 10);
+			
+			while ($customerHappiness > 0)
+			{
+				$drinkChance = rand (1, ($customer["ale_pref"] + $customer["wine_pref"]));
+				
+				$drinkChoice = rand (1, $drinkChance);
+				
+				if ($drinkChoice <= $customer["ale_pref"])
+				{
+					if ($currentGame["mug_ale"] > 0)
+					{
+						$profitPercent = $currentGame["ale_price"] / GetItemCostByName("mug_ale") - .25;
+						$stingyFactor = $profitPercent * $customerStinginess;
+						
+						$customerHappiness -= $stingyFactor + 1;
+						
+						if ($customerHappiness >= 0)
+						{
+							$currentGame["mug_ale"] -= 1;
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], "Sold ale to " . $customer["name"]);
+							$currentGame["currentmoney"] += $currentGame["ale_price"];
+						}
+						else if ($customerHappiness < -5)
+						{
+							$customerHappiness = -1;
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customer["name"] . " angered by ale price.");
+						}
+						else
+						{
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customer["name"] . " left happiness - " . $customerHappiness);
+						}
+					}
+					else 
+					{
+						$customerHappiness -= 3;
+						RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customer["name"] . " angry for ale.");
+					}
+				}
+				else
+				{
+					if ($currentGame["glass_wine"] > 0)
+					{
+						
+						$profitPercent = GetItemCostByName("glass_wine") / $currentGame["wine_price"] - 1.25;
+						$stingyFactor = $profitPercent * $customerStinginess;
+						
+						$customerHappiness -= 1 * $stingyFactor;
+						
+						if ($customerHappiness >= 0)
+						{
+							$currentGame["glass_wine"] -= 1;
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], "Sold wine to " . $customer["name"]);
+							$currentGame["currentmoney"] += $currentGame["wine_price"];
+						}
+						else if ($customerHappiness < -5)
+						{
+							$customerHappiness = -1;
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customer["name"] . " angered by ale price.");
+						}
+						else
+						{
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customer["name"] . " left happiness - " . $customerHappiness);
+						}
+					}
+					else 
+					{
+						$customerHappiness -= 3;
+						RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customer["name"] . " angry for wine.");
+					}
+				}
+			}
 		}
+		
 		return $currentGame;
 	}
 	
-	function ReceiveOrders($currentGame, $newAleOrder, $newWineOrder)
+	function CheckForShipments($currentGame, $newAleOrder, $newWineOrder)
 	{
 		if ($newAleOrder > 0)
 		{
@@ -125,22 +201,6 @@
 			
 		}
 		return $currentGame;
-	}
-
-	function PickDaysCustomers()
-	{
-		//Pick Customers that will visit
-	}
-	
-	function UpdateCustomers()
-	{
-		//Did Customers like what you offered?
-		//Did you not have what customer requested?
-	}
-	
-	function CheckForShipments()
-	{
-		//Shipments arrive at end of day
 	}
 	
 	function EndDay($currentGame)

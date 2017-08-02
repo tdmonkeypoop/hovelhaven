@@ -115,7 +115,12 @@
 	    		Potato Sacks: <?=$currentGame["potato_sack"]?><br><br>
 	    	</div>
 	    	<div class="ledger-card card">
-	    		
+	    		<?php
+	    		$yesterdaysDate = $currentGame["currentdate"] - 1;
+	    		$yesterdaysLedger = GetDaysLedger($currentGame["gameid"], $yesterdaysDate);
+	    		foreach($yesterdaysLedger as $currentLedger): ?>
+   					<?= $currentLedger["record"] ?><br>
+   				<?php endforeach; ?>
 	    	</div>
 		    <!--Totals-->
 	    	<div class="summary-card-total card-total middled justify-right"></div>

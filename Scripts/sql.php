@@ -193,3 +193,44 @@
 		
 		return $row["qty"];
 	}
+	
+	function GetCustomerTypes()
+	{
+		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		
+		$sql = "SELECT id FROM customers";
+		$result = $conn->query($sql);
+
+		return mysqli_num_rows($result);
+	}
+	
+	function GetCustomerById($id)
+	{
+		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		
+		$sql = "SELECT * FROM customers WHERE id = '$id'";
+		$result = $conn->query($sql);
+
+		$row = $result->fetch_assoc();
+		
+		return $row;
+	}
+	
+	function RecordLedger($gameId, $gameDate, $record)
+	{
+		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+
+		$sql = "INSERT INTO ledgers VALUES ('$gameId', '$gameDate', '$record')";
+		$conn->query($sql);
+	}
+	
+	function GetDaysLedger($gameId, $gameDate)
+	{
+		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		
+		$sql = "SELECT record FROM ledgers WHERE (gameid = '$gameId') AND (date = '$gameDate')";
+		$result = $conn->query($sql);
+
+		return $result;
+		
+	}
