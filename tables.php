@@ -99,3 +99,25 @@
     $conn->query($sql);
     $sql = "INSERT INTO items VALUES(14, 'potato_sack', 1, 20)";
     $conn->query($sql);
+    
+    
+    $sql = "CREATE TABLE customers (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, ale_pref INT, wine_pref INT, chicken_pref INT, pork_chop_pref INT, carrot_pref INT, potato_pref INT)";
+    $conn->query($sql);
+    /*
+        customers
+            id
+            name
+            ale_pref
+            wine_pref
+            chicken_pref
+            pork_pref
+            carrot_pref
+            potato_pref
+    */
+    
+    $sql = "INSERT INTO customers VALUES(1, 'common', 2, 1, 1, 1, 5, 5)";
+    $conn->query($sql);
+    $sql = "INSERT INTO customers VALUES(2, 'wealthy', 1, 3, 5, 5, 1, 1)";
+    $conn->query($sql);
+    $sql = "INSERT INTO customers VALUES(3, 'Drunk', 5, 1, 0, 0, 0, 0)";
+    $conn->query($sql);
