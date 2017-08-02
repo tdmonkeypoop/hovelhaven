@@ -64,7 +64,6 @@
 	if($newFineMealPrice > 0)
 		$currentGame["fine_meal_price"]=$newFineMealPrice;
 	
-	$currentGame = OpenCases($currentGame);
 	$currentGame = PickDaysCustomers($currentGame);
 	$currentGame = CheckForShipments($currentGame, $newAleOrder, $newWineOrder);
 	EndDay($currentGame);
@@ -96,6 +95,7 @@
 		
 		for ($i = 0; $i < $numberOfCustomers; $i++)
 		{
+			$currentGame = OpenCases($currentGame);
 			$customerId = rand(1, $uniqueCustomers);
 			
 			$customer = GetCustomerById($customerId);
@@ -144,10 +144,10 @@
 					if ($currentGame["glass_wine"] > 0)
 					{
 						
-						$profitPercent = GetItemCostByName("glass_wine") / $currentGame["wine_price"] - 1.25;
+						$profitPercent =  $currentGame["wine_price"] / GetItemCostByName("glass_wine") - .25;
 						$stingyFactor = $profitPercent * $customerStinginess;
 						
-						$customerHappiness -= 1 * $stingyFactor;
+						$customerHappiness -= $stingyFactor + 1;
 						
 						if ($customerHappiness >= 0)
 						{
