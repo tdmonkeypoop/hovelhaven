@@ -117,7 +117,7 @@
 	{
 	    $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
 
-		$sql = "INSERT INTO games (userid, currentdate, currentmoney, mug_ale, glass_wine, common_meal, fine_meal, chicken, pork_chop, carrot, potato, barrel_wine, keg_ale, full_chicken, pig, carrot_bag, potato_sack, ale_price, wine_price, common_meal_price, fine_meal_price) values ('$userId', 0, 10.00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.05, .20, .8, 2.2)";
+		$sql = "INSERT INTO games (gameid, userid, currentdate, currentmoney, mug_ale, glass_wine, common_meal, fine_meal, chicken, pork_chop, carrot, potato, barrel_wine, keg_ale, full_chicken, pig, carrot_bag, potato_sack, ale_price, wine_price, common_meal_price, fine_meal_price) values ('$userId', '$userId', 0, 10.00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.05, .20, .8, 2.2)";
 		$conn->query($sql);
 		
 		$sql = "SELECT gameid FROM games where userid = '$userId'";
@@ -136,7 +136,7 @@
 	{
 		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
 		
-		$sql = "SELECT * FROM games WHERE gameid = '$gameId'";
+		$sql = "SELECT * FROM games WHERE gameid = '$gameId' ORDER BY currentdate DESC";
 		$result = $conn->query($sql);
 
 		$row = $result->fetch_assoc();
@@ -148,10 +148,19 @@
 	{
 		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
 		
-		$sql = "INSERT INTO games VALUES (";
+		foreach($currentGame as $key => $value)
+		{
+			$keys[] = $key;
+			$values[] = $value;
+		}
+		$keysImploded = implode(", ", $keys);
+		$valuesImploded = implode(" , ", $values);
 		
-		$sql .= implode(",", $currentGame) . ")";
+		$sql = "INSERT INTO games (" . $keysImploded . ") VALUES (" . $valuesImploded . ")";
+    
+		$conn->query($sql);
 		
+		$sql = "INSERT INTO test VALUES ('" . $sql ."')";
 		$conn->query($sql);
 	}
 	

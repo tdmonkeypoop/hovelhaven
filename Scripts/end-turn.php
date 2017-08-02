@@ -67,7 +67,7 @@
 	$currentGame = OpenCases($currentGame);
 	$currentGame = PickDaysCustomers($currentGame);
 	$currentGame = CheckForShipments($currentGame, $newAleOrder, $newWineOrder);
-	$currentGame = EndDay($currentGame);
+	EndDay($currentGame);
 	
 	header("location: ../tavern.php");
 
@@ -209,6 +209,4 @@
 		$currentGame["currentdate"]++; 
 	
 		EndTurn($currentGame);
-		
-		return $currentGame;
 	}

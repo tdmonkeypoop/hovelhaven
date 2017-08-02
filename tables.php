@@ -31,7 +31,7 @@
             record
     */
 
-    $sql = "CREATE TABLE games (gameid INT PRIMARY KEY AUTO_INCREMENT, userid INT NOT NULL, currentdate INT NOT NULL, currentmoney DECIMAL(11, 2), mug_ale INT, glass_wine INT, common_meal INT, fine_meal INT, chicken INT, pork_chop INT, carrot INT, potato INT, barrel_wine INT, keg_ale INT, full_chicken INT, pig INT, carrot_bag INT, potato_sack INT, ale_price DECIMAL(6,2), wine_price DECIMAL(6,2), common_meal_price DECIMAL(6,2), fine_meal_price DECIMAL(6,2))";
+    $sql = "CREATE TABLE games (gameid INT, userid INT NOT NULL, currentdate INT NOT NULL, currentmoney DECIMAL(11, 2), mug_ale INT, glass_wine INT, common_meal INT, fine_meal INT, chicken INT, pork_chop INT, carrot INT, potato INT, barrel_wine INT, keg_ale INT, full_chicken INT, pig INT, carrot_bag INT, potato_sack INT, ale_price DECIMAL(6,2), wine_price DECIMAL(6,2), common_meal_price DECIMAL(6,2), fine_meal_price DECIMAL(6,2))";
     $conn->query($sql);
     /*
         games
