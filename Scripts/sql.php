@@ -148,26 +148,20 @@
 	{
 		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
 		
-		$sql = "UPDATE games Set ";
-		$gameId = $currentGame['gameid'];
-		$variableArray = array();
-		foreach($currentGame as $key => $value)
-		{
-			$variableArray[] = $key . " = '" . $value . "'";
-		}
+		$sql = "INSERT INTO games VALUES (";
 		
-		$sql .= implode(",", $variableArray);
-		$sql .= " WHERE gameid = '$gameId'";
+		$sql .= implode(",", $currentGame) . ")";
+		
 		$conn->query($sql);
 	}
 	
 	function FormatDate($days)
 	{
-		$numberOfYears = ($days / 360)+1;
-		$numberOfMonths = (($days % 360) / 30)+1;
-		$numberOfDays = (($days % 360) % 30)+1;
+		$numberOfYears = (int)($days / 360)+1;
+		$numberOfMonths = (int)(($days % 360) / 30)+1;
+		$numberOfDays = (int)(($days % 360) % 30)+1;
 		
-		return "Day " . (int)$numberOfDays . " of Month " . (int)$numberOfMonths . " of Year " . (int)$numberOfYears;
+		return "Year: " . $numberOfYears . " Month: " . $numberOfMonths . " Day: " . (int)$numberOfDays;
 	}
 	
 	function GetItemCostByName($name)

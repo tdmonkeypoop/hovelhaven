@@ -81,7 +81,7 @@
     		<div class="ledger-card-title card-title middled centered">LEDGER</div>
 	    	<!--Cards-->
 	    	<div class="summary-card card">
-	    		Current Day: <?=FormatDate($currentGame["currentdate"])?><br>
+	    		Current Day:<br><?=FormatDate($currentGame["currentdate"])?><br><br>
 	    		Total Cash: $<?=$currentGame["currentmoney"]?><br>
 	    	</div>
 	    	<div class="prices-card card">
