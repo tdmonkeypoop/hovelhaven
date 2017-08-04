@@ -115,7 +115,7 @@ body{
 
 .card-container{
     display: grid;
-    grid-template-columns: 4% 20% 4% 20% 4% 20% 4% 20% 4%;
+    grid-template-columns: 2% 20% 2% 20% 2% 13% 2% 37% 2%;
     grid-template-rows: 5% auto 5%;
     grid-tempate-areas:
         "summary-card-title"

@@ -95,7 +95,6 @@
 		
 		for ($i = 0; $i < $numberOfCustomers; $i++)
 		{
-			$currentGame = OpenCases($currentGame);
 			$customerId = rand(1, $uniqueCustomers);
 			
 			$customer = GetCustomerById($customerId);
@@ -107,6 +106,7 @@
 				$drinkChance = rand (1, ($customer["ale_pref"] + $customer["wine_pref"]));
 				
 				$drinkChoice = rand (1, $drinkChance);
+				$currentGame = OpenCases($currentGame);
 				
 				if ($drinkChoice <= $customer["ale_pref"])
 				{
@@ -117,26 +117,26 @@
 						
 						$customerHappiness -= $stingyFactor + 1;
 						
-						if ($customerHappiness >= 0)
+						if ($customerHappiness >= -1)
 						{
 							$currentGame["mug_ale"] -= 1;
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], "Sold ale to " . $customer["name"]);
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") bought mug of ale");
 							$currentGame["currentmoney"] += $currentGame["ale_price"];
 						}
 						else if ($customerHappiness < -5)
 						{
 							$customerHappiness = -1;
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customer["name"] . " angered by ale price.");
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") angered by ale price");
 						}
 						else
 						{
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customer["name"] . " left happiness - " . $customerHappiness);
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") left happy");
 						}
 					}
 					else 
 					{
 						$customerHappiness -= 3;
-						RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customer["name"] . " angry for ale.");
+						RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") angry for ale");
 					}
 				}
 				else
@@ -152,23 +152,23 @@
 						if ($customerHappiness >= 0)
 						{
 							$currentGame["glass_wine"] -= 1;
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], "Sold wine to " . $customer["name"]);
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") bought glass of wine");
 							$currentGame["currentmoney"] += $currentGame["wine_price"];
 						}
 						else if ($customerHappiness < -5)
 						{
 							$customerHappiness = -1;
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customer["name"] . " angered by ale price.");
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") angered by wine price");
 						}
 						else
 						{
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customer["name"] . " left happiness - " . $customerHappiness);
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") left happy");
 						}
 					}
 					else 
 					{
 						$customerHappiness -= 3;
-						RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customer["name"] . " angry for wine.");
+						RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") angry for wine");
 					}
 				}
 			}
