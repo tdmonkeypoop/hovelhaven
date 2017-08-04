@@ -1,5 +1,6 @@
 <?php
 	session_start();
+
 	require_once("sql.php");
 	
 	if (empty($_SESSION["userId"]))
@@ -21,18 +22,16 @@
 	$inputArray["ordercarrot"]		= htmlspecialchars(stripslashes(trim($_POST["ordercarrot"])));
 	$inputArray["orderpotato"]		= htmlspecialchars(stripslashes(trim($_POST["orderpotato"])));
 	
-	if(!empty($inputArray["ale_price"]))
-		$currentGame["ale_price"]=$inputArray["ale_price"];
-	if(!empty($inputArray["wine_price"]))
-		$currentGame["wine_price"]=$inputArray["wine_price"];
+	if(!empty($inputArray["aleprice"]))
+		$currentGame["ale_price"]=$inputArray["aleprice"];
+	if(!empty($inputArray["wineprice"]))
+		$currentGame["wine_price"]=$inputArray["wineprice"];
 	
 	$currentGame = PickDaysCustomers($currentGame);
-	$currentGame = CheckForShipments($currentGame, $newAleOrder, $newWineOrder);
+	$currentGame = CheckForShipments($currentGame, $inputArray["orderale"], $inputArray["orderwine"]);
 	EndDay($currentGame);
 	
 	header("location: ../tavern.php");
-
-
 
 	function OpenCases($currentGame)
 	{
