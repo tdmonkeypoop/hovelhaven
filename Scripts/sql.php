@@ -144,6 +144,25 @@
 		return $row;
 	}
 	
+	function GetGameByDate($gameId, $date)
+	{
+		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		
+		$sql = "SELECT * FROM games WHERE (gameid = '$gameId') AND (currentdate = '$date')";
+		$result = $conn->query($sql);
+
+		if(!empty($result))
+		{
+			$row = $result->fetch_assoc();
+		
+			return $row;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
 	function EndTurn($currentGame)
 	{
 		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);

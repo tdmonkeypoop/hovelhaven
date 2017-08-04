@@ -17,6 +17,7 @@
 	}
 	
 	$currentGame = GetCurrentGame($_SESSION["gameId"]);
+	$yesterdayGame = GetGameByDate($_SESSION["gameId"], $currentGame["currentdate"] - 1);
 ?>
 
 <html>
@@ -82,7 +83,11 @@
 	    	<!--Cards-->
 	    	<div class="summary-card card">
 	    		Current Day:<br><?=FormatDate($currentGame["currentdate"])?><br><br>
-	    		Total Cash: $<?=$currentGame["currentmoney"]?><br>
+	    		Total Cash: $<?=$currentGame["currentmoney"]?><br><br>
+	    		&lt;-- Yesterday --><br>
+	    		Total Earned: $<?= $currentGame["currentmoney"] - $yesterdayGame["currentmoney"]?><br>
+	    		Ale sold: <?= $yesterdayGame["mug_ale"] - $currentGame["mug_ale"] ?><br>
+	    		Wine sold: <?= $yesterdayGame["glass_wine"] - $currentGame["glass_wine"] ?><br>
 	    	</div>
 	    	<div class="prices-card card">
 			<label>Mug of Ale: $<?= $currentGame["ale_price"]?> New:$</label><input type="text" style="width:40px; float:right" placeholder="<?= $currentGame["ale_price"]?>" name="aleprice"><br><br>
