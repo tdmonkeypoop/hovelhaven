@@ -90,10 +90,10 @@
 	    		Wine sold: <?= $yesterdayGame["glass_wine"] - $currentGame["glass_wine"] ?><br>
 	    	</div>
 	    	<div class="prices-card card">
-			<label>Mug of Ale: $<?= $currentGame["ale_price"]?> New:$</label><input type="text" style="width:40px; float:right" placeholder="<?= $currentGame["ale_price"]?>" name="aleprice"><br><br>
-			<label>Glass of Wine: $<?= $currentGame["wine_price"]?> New:$</label><input type="text" style="width:40px; float:right" placeholder="<?= $currentGame["wine_price"]?>" name="wineprice"><br><br>
-			<label>Common Meal: $<?= $currentGame["common_meal_price"]?> New:$</label><input type="text" style="width:40px; float:right" placeholder="<?= $currentGame["common_meal_price"]?>" name="commonmealprice"><br><br>
-			<label>Fine Meal: $<?= $currentGame["fine_meal_price"]?> New:$</label><input type="text" style="width:40px; float:right" placeholder="<?= $currentGame["fine_meal_price"]?>" name="finemealprice"><br><br>
+			<label>Mug of Ale: $<?= $currentGame["mug_ale_price"]?> New:$</label><input type="text" style="width:40px; float:right" value="<?= $currentGame["mug_ale_price"]?>" name="aleprice"><br><br>
+			<label>Glass of Wine: $<?= $currentGame["glass_wine_price"]?> New:$</label><input type="text" style="width:40px; float:right" value="<?= $currentGame["glass_wine_price"]?>" name="wineprice"><br><br>
+			<label>Common Meal: $<?= $currentGame["common_meal_price"]?> New:$</label><input type="text" style="width:40px; float:right" value="<?= $currentGame["common_meal_price"]?>" name="commonmealprice"><br><br>
+			<label>Fine Meal: $<?= $currentGame["fine_meal_price"]?> New:$</label><input type="text" style="width:40px; float:right" value="<?= $currentGame["fine_meal_price"]?>" name="finemealprice"><br><br>
 			<br><br>
 			&lt;-- ORDER --><br><br>
 			<label>Keg of Ale: $<?= GetItemCostByName("keg_ale") ?></label><input type="text" style="width:40px; float:right" placeholder="0" name="orderale"><br><br>

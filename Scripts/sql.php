@@ -114,7 +114,7 @@
 	{
 	    $db = Database::getInstance();
 
-		$sql = "INSERT INTO games (gameid, userid, currentdate, currentmoney, mug_ale, glass_wine, common_meal, fine_meal, chicken, pork_chop, carrot, potato, barrel_wine, keg_ale, full_chicken, pig, carrot_bag, potato_sack, ale_price, wine_price, common_meal_price, fine_meal_price) values ('$userId', '$userId', 0, 10.00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.05, .20, .8, 2.2)";
+		$sql = "INSERT INTO games (gameid, userid, currentdate, currentmoney, mug_ale, glass_wine, common_meal, fine_meal, chicken, pork_chop, carrot, potato, barrel_wine, keg_ale, full_chicken, pig, carrot_bag, potato_sack, mug_ale_price, glass_wine_price, common_meal_price, fine_meal_price) values ('$userId', '$userId', 0, 10.00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.05, .20, .8, 2.2)";
 		$db->query($sql);
 		
 		$sql = "SELECT gameid FROM games where userid = '$userId'";
@@ -188,53 +188,7 @@
 		
 		return "Year: " . $numberOfYears . " Month: " . $numberOfMonths . " Day: " . (int)$numberOfDays;
 	}
-	
-	function GetItemCostByName($name)
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT cost FROM items WHERE name = '$name'";
-		$result = $db->query($sql);
 
-		$row = $result->fetch_assoc();
-		
-		return $row["cost"];
-	}
-	
-	function GetItemQtyByName($name)
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT qty FROM items WHERE name = '$name'";
-		$result = $db->query($sql);
-
-		$row = $result->fetch_assoc();
-		
-		return $row["qty"];
-	}
-	
-	function GetCustomerTypes()
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT id FROM customers";
-		$result = $db->query($sql);
-
-		return mysqli_num_rows($result);
-	}
-	
-	function GetCustomerById($id)
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT * FROM customers WHERE id = '$id'";
-		$result = $db->query($sql);
-
-		$row = $result->fetch_assoc();
-		
-		return $row;
-	}
-	
 	function RecordLedger($gameId, $gameDate, $record)
 	{
 		$db = Database::getInstance();
@@ -252,6 +206,18 @@
 
 		return $result;
 		
+	}
+	
+		function GetItemCostByName($name)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT cost FROM items WHERE name = '$name'";
+		$result = $db->query($sql);
+
+		$row = $result->fetch_assoc();
+		
+		return $row["cost"];
 	}
 	
 	

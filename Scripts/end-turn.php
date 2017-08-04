@@ -2,6 +2,7 @@
 	session_start();
 
 	require_once("sql.php");
+	require_once("database.php");
 	
 	if (empty($_SESSION["userId"]))
 	{
@@ -11,21 +12,16 @@
 	$currentGame = GetCurrentGame($_SESSION["gameId"]);
 	
 	$inputArray = array();
-	$inputArray["aleprice"]			= htmlspecialchars(stripslashes(trim($_POST["aleprice"])));
-	$inputArray["wineprice"] 		= htmlspecialchars(stripslashes(trim($_POST["wineprice"])));
-	$inputArray["commonmealprice"]	= htmlspecialchars(stripslashes(trim($_POST["commonmealprice"])));
-	$inputArray["finemealprice"] 	= htmlspecialchars(stripslashes(trim($_POST["finemealprice"])));
-	$inputArray["orderale"]			= htmlspecialchars(stripslashes(trim($_POST["orderale"])));
-	$inputArray["orderwine"] 		= htmlspecialchars(stripslashes(trim($_POST["orderwine"])));
-	$inputArray["orderchicken"]		= htmlspecialchars(stripslashes(trim($_POST["orderchicken"])));
-	$inputArray["orderpig"]			= htmlspecialchars(stripslashes(trim($_POST["orderpig"])));
-	$inputArray["ordercarrot"]		= htmlspecialchars(stripslashes(trim($_POST["ordercarrot"])));
-	$inputArray["orderpotato"]		= htmlspecialchars(stripslashes(trim($_POST["orderpotato"])));
-	
-	if(!empty($inputArray["aleprice"]))
-		$currentGame["ale_price"]=$inputArray["aleprice"];
-	if(!empty($inputArray["wineprice"]))
-		$currentGame["wine_price"]=$inputArray["wineprice"];
+	$currentGame["mug_ale_price"]		= htmlspecialchars(stripslashes(trim($_POST["aleprice"])));
+	$currentGame["glass_wine_price"] 	= htmlspecialchars(stripslashes(trim($_POST["wineprice"])));
+	$currentGame["common_meal_price"]	= htmlspecialchars(stripslashes(trim($_POST["commonmealprice"])));
+	$currentGame["fine_meal_price"] 	= htmlspecialchars(stripslashes(trim($_POST["finemealprice"])));
+	$inputArray["orderale"]				= htmlspecialchars(stripslashes(trim($_POST["orderale"])));
+	$inputArray["orderwine"] 			= htmlspecialchars(stripslashes(trim($_POST["orderwine"])));
+	$inputArray["orderchicken"]			= htmlspecialchars(stripslashes(trim($_POST["orderchicken"])));
+	$inputArray["orderpig"]				= htmlspecialchars(stripslashes(trim($_POST["orderpig"])));
+	$inputArray["ordercarrot"]			= htmlspecialchars(stripslashes(trim($_POST["ordercarrot"])));
+	$inputArray["orderpotato"]			= htmlspecialchars(stripslashes(trim($_POST["orderpotato"])));
 	
 	$currentGame = PickDaysCustomers($currentGame);
 	$currentGame = CheckForShipments($currentGame, $inputArray["orderale"], $inputArray["orderwine"]);
@@ -52,92 +48,150 @@
 
 	function PickDaysCustomers($currentGame)
 	{
-		$numberOfCustomers = rand(3, 10);
-		
-		$uniqueCustomers = GetCustomerTypes();
+		$numberOfCustomers	= CalculateNumberOfCustomers();
+		$aleProfitPercent	= ($currentGame["mug_ale_price"] / GetItemCostByName("mug_ale")) - 1.25;
+		$wineProfitPercent	= ($currentGame["glass_wine_price"] / GetItemCostByName("glass_wine")) - 1.25;
 		
 		for ($i = 0; $i < $numberOfCustomers; $i++)
 		{
-			$customerId = rand(1, $uniqueCustomers);
+			$customer = CreateCustomer();
+	
+			$customerTotalResponse =  $i ."-" . $customer["name"] . " drank ";
+			$customerTotalWine = 0;
+			$customerTotalAle = 0;
 			
-			$customer = GetCustomerById($customerId);
-			$customerHappiness = rand (1, 10);
-			$customerStinginess = rand (1, 3);
-			
-			while ($customerHappiness > 0)
+			while ($customer['happiness'] > 0)
 			{
-				$drinkChance = rand (1, ($customer["ale_pref"] + $customer["wine_pref"]));
+				$customerResponse =  $i ."-" . $customer["name"] . "(H,S)-(" . $customer['happiness'] . "," . $customer['stinginess'] . ") ";
+		
+				$drinkChance = rand (1, ($customer['ale_pref'] + $customer['wine_pref']));
 				
 				$drinkChoice = rand (1, $drinkChance);
+				
 				$currentGame = OpenCases($currentGame);
 				
 				if ($drinkChoice <= $customer["ale_pref"])
 				{
 					if ($currentGame["mug_ale"] > 0)
 					{
-						$profitPercent = $currentGame["ale_price"] / GetItemCostByName("mug_ale") - .25;
-						$stingyFactor = $profitPercent * $customerStinginess;
+						$stingyFactor = $aleProfitPercent * $customer['stinginess'];
 						
-						$customerHappiness -= $stingyFactor + 1;
+						if ($stingyFactor < 0)
+							$stingyFactor = 0;
 						
-						if ($customerHappiness >= -1)
+						$customer['happiness'] -= $stingyFactor + 1;
+						
+						if ($customer['happiness'] >= -5)
 						{
-							$currentGame["mug_ale"] -= 1;
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") bought mug of ale");
-							$currentGame["currentmoney"] += $currentGame["ale_price"];
+							$customerTotalAle++;
+							$currentGame = GiveCustomerAle($currentGame);	
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customerResponse . "ale ". $currentGame['mug_ale'] . " remain.");
 						}
-						else if ($customerHappiness < -5)
+						else if ($customer['happiness'] < -5 && $customerTotalWine == 0 && $customerTotalAle == 0)
 						{
-							$customerHappiness = -1;
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") angered by ale price");
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customerResponse . "left angry (ale price)");
 						}
 						else
 						{
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") left happy");
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $customerResponse . "left happy");
 						}
 					}
 					else 
 					{
-						$customerHappiness -= 3;
-						RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") angry for ale");
+						$customer['happiness'] -= 3;
+						RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $customerResponse . "angry for ale");
 					}
 				}
 				else
 				{
 					if ($currentGame["glass_wine"] > 0)
 					{
+						$stingyFactor = $wineProfitPercent * $customer['stinginess'];
 						
-						$profitPercent =  $currentGame["wine_price"] / GetItemCostByName("glass_wine") - .25;
-						$stingyFactor = $profitPercent * $customerStinginess;
+						if ($stingyFactor < 0)
+							$stingyFactor = 0;
+							
+						$customer['happiness'] -= $stingyFactor + 1;
 						
-						$customerHappiness -= $stingyFactor + 1;
-						
-						if ($customerHappiness >= 0)
+						if ($customer['happiness'] >= -5)
 						{
-							$currentGame["glass_wine"] -= 1;
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") bought glass of wine");
-							$currentGame["currentmoney"] += $currentGame["wine_price"];
+							$customerTotalWine++;
+							$currentGame = GiveCustomerWine($currentGame);	
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customerResponse . "wine " . $currentGame['glass_wine'] . " remain");
 						}
-						else if ($customerHappiness < -5)
+						else if ($customer['happiness'] < -5 && $customerTotalWine == 0 && $customerTotalAle == 0)
 						{
-							$customerHappiness = -1;
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") angered by wine price");
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customerResponse . "left angry (wine price)");
 						}
 						else
 						{
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") left happy");
+							RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $customerResponse . "left happy");
 						}
 					}
 					else 
 					{
-						$customerHappiness -= 3;
-						RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $i ."-" . $customer["name"] . "(H,S)-(" . $customerHappiness . "," . $customerStinginess . ") angry for wine");
+						$customer['happiness'] -= 3;
+						RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $customerResponse . "angry for wine");
 					}
 				}
 			}
 		}
 		
 		return $currentGame;
+	}
+	
+	function GiveCustomerAle($currentGame)
+	{
+		$currentGame['mug_ale']--;
+		$currentGame['currentmoney'] += $currentGame['mug_ale_price'];
+		
+		return $currentGame;
+	}
+	
+	function GiveCustomerWine($currentGame)
+	{
+		$currentGame['glass_wine']--;
+		$currentGame['currentmoney'] += $currentGame['glass_wine_price'];
+		
+		return $currentGame;
+	}
+	
+	function CreateCustomer()
+	{
+		$uniqueCustomers = GetCustomerTypes();
+			
+		$newCustomer = GetCustomerById(rand(1, $uniqueCustomers));
+		$newCustomer['happiness'] = rand (1, 10);
+		$newCustomer['stinginess'] = rand (1, 3);
+		
+		return $newCustomer;
+	}
+	
+	function CalculateNumberOfCustomers()
+	{
+		return rand(3, 10);
+	}
+	
+	function GetCustomerTypes()
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT id FROM customers";
+		$result = $db->query($sql);
+
+		return mysqli_num_rows($result);
+	}
+	
+	function GetCustomerById($id)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM customers WHERE id = '$id'";
+		$customer = $db->query($sql);
+
+		$row = $customer->fetch_assoc();
+		
+		return $row;
 	}
 	
 	function CheckForShipments($currentGame, $newAleOrder, $newWineOrder)
@@ -172,4 +226,18 @@
 		$currentGame["currentdate"]++; 
 	
 		EndTurn($currentGame);
+	}
+
+
+	
+	function GetItemQtyByName($name)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT qty FROM items WHERE name = '$name'";
+		$result = $db->query($sql);
+
+		$row = $result->fetch_assoc();
+		
+		return $row["qty"];
 	}
