@@ -1,5 +1,5 @@
 <?php
-	require_once ("config.php");
+	require ("database.php");
 	
 	function ValidUsername($username)
 	{
@@ -27,29 +27,26 @@
 
 	function VerifyUser($username, $password)
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 
-		$encryptedPassword = md5($password . "monKey");
-		$sql = "SELECT password FROM users where username = '$username'";
-		$result = $conn->query($sql);
+    	$sql = "SELECT password FROM users where username = '$username' and password = md5('${password}monKey')";
+		$valid_user = $db->query($sql);
 
-		if ($result ->num_rows > 0)
+		if ($valid_user->num_rows > 0)
 		{
-			$row = $result->fetch_assoc();
-			if ($encryptedPassword == $row["password"])
-			{
 				return true;
-			}
-		}
-		
-		return false;
+    	}
+    	else
+    	{
+				return false;
+    	}
 	}
 	
 	function UserExists($username)
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 		$sql = "SELECT password FROM users where username = '$username'";
-		$result = $conn->query($sql);
+		$result = $db->query($sql);
 
 		if ($result ->num_rows > 0)
 		{
@@ -61,9 +58,9 @@
 	
 	function GetUserId($username)
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 		$sql = "SELECT id FROM users where username = '$username'";
-		$result = $conn->query($sql);
+		$result = $db->query($sql);
 
 		if ($result ->num_rows > 0)
 		{
@@ -76,9 +73,9 @@
 	
 	function GetUsername($id)
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 		$sql = "SELECT username FROM users where id = '$id'";
-		$result = $conn->query($sql);
+		$result = $db->query($sql);
 
 		if ($result ->num_rows > 0)
 		{
@@ -91,9 +88,9 @@
 	
 	function GetUserGameId($userId)
 	{
-	    $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+	    $db = Database::getInstance();
 		$sql = "SELECT gameid FROM users where id = '$userId'";
-		$result = $conn->query($sql);
+		$result = $db->query($sql);
 
 		if ($result ->num_rows > 0)
 		{
@@ -106,38 +103,38 @@
 	
 	function NewUser($username, $password)
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 
 		$encryptedPassword = md5($password . "monKey");
 		$sql = "INSERT INTO users (username, password) values ('$username','$encryptedPassword')";
-		$conn->query($sql);
+		$db->query($sql);
 	}
 	
 	function NewGame($userId)
 	{
-	    $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+	    $db = Database::getInstance();
 
 		$sql = "INSERT INTO games (gameid, userid, currentdate, currentmoney, mug_ale, glass_wine, common_meal, fine_meal, chicken, pork_chop, carrot, potato, barrel_wine, keg_ale, full_chicken, pig, carrot_bag, potato_sack, ale_price, wine_price, common_meal_price, fine_meal_price) values ('$userId', '$userId', 0, 10.00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0.05, .20, .8, 2.2)";
-		$conn->query($sql);
+		$db->query($sql);
 		
 		$sql = "SELECT gameid FROM games where userid = '$userId'";
-		$result = $conn->query($sql);
+		$result = $db->query($sql);
 
 		$row = $result->fetch_assoc();
 		$gameId = $row["gameid"];
 		
 		$sql = "UPDATE users SET gameid = '$gameId' WHERE id='$userId'";
-		$result = $conn->query($sql);
+		$result = $db->query($sql);
 		
 		return $gameId;
 	}
 	
 	function GetCurrentGame($gameId)
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 		
 		$sql = "SELECT * FROM games WHERE gameid = '$gameId' ORDER BY currentdate DESC";
-		$result = $conn->query($sql);
+		$result = $db->query($sql);
 
 		$row = $result->fetch_assoc();
 		
@@ -146,10 +143,10 @@
 	
 	function GetGameByDate($gameId, $date)
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 		
 		$sql = "SELECT * FROM games WHERE (gameid = '$gameId') AND (currentdate = '$date')";
-		$result = $conn->query($sql);
+		$result = $db->query($sql);
 
 		if(!empty($result))
 		{
@@ -165,7 +162,7 @@
 	
 	function EndTurn($currentGame)
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 		
 		foreach($currentGame as $key => $value)
 		{
@@ -177,10 +174,10 @@
 		
 		$sql = "INSERT INTO games (" . $keysImploded . ") VALUES (" . $valuesImploded . ")";
     
-		$conn->query($sql);
+		$db->query($sql);
 		
 		$sql = "INSERT INTO test VALUES ('" . $sql ."')";
-		$conn->query($sql);
+		$db->query($sql);
 	}
 	
 	function FormatDate($days)
@@ -194,10 +191,10 @@
 	
 	function GetItemCostByName($name)
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 		
 		$sql = "SELECT cost FROM items WHERE name = '$name'";
-		$result = $conn->query($sql);
+		$result = $db->query($sql);
 
 		$row = $result->fetch_assoc();
 		
@@ -206,10 +203,10 @@
 	
 	function GetItemQtyByName($name)
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 		
 		$sql = "SELECT qty FROM items WHERE name = '$name'";
-		$result = $conn->query($sql);
+		$result = $db->query($sql);
 
 		$row = $result->fetch_assoc();
 		
@@ -218,20 +215,20 @@
 	
 	function GetCustomerTypes()
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 		
 		$sql = "SELECT id FROM customers";
-		$result = $conn->query($sql);
+		$result = $db->query($sql);
 
 		return mysqli_num_rows($result);
 	}
 	
 	function GetCustomerById($id)
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 		
 		$sql = "SELECT * FROM customers WHERE id = '$id'";
-		$result = $conn->query($sql);
+		$result = $db->query($sql);
 
 		$row = $result->fetch_assoc();
 		
@@ -240,19 +237,25 @@
 	
 	function RecordLedger($gameId, $gameDate, $record)
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 
 		$sql = "INSERT INTO ledgers VALUES ('$gameId', '$gameDate', '$record')";
-		$conn->query($sql);
+		$db->query($sql);
 	}
 	
 	function GetDaysLedger($gameId, $gameDate)
 	{
-		$conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
+		$db = Database::getInstance();
 		
 		$sql = "SELECT record FROM ledgers WHERE (gameid = '$gameId') AND (date = '$gameDate')";
-		$result = $conn->query($sql);
+		$result = $db->query($sql);
 
 		return $result;
 		
 	}
+	
+	
+	
+	
+	
+	

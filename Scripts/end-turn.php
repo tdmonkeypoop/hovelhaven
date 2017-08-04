@@ -2,73 +2,37 @@
 	session_start();
 	require_once("sql.php");
 	
-	if (!empty($_SESSION["userId"]))
-	{
-	}
-	else
+	if (empty($_SESSION["userId"]))
 	{
 		header("location: ../login.php");
 	}
 	
 	$currentGame = GetCurrentGame($_SESSION["gameId"]);
 	
-	if($_SERVER["REQUEST_METHOD"] == "POST")
-	{
-		$newAlePrice = trim($_POST["aleprice"]);
-		$newAlePrice = stripslashes($newAlePrice);
-		$newAlePrice = htmlspecialchars($newAlePrice);
-		
-		$newWinePrice = trim($_POST["wineprice"]);
-		$newWinePrice = stripslashes($newWinePrice);
-		$newWinePrice = htmlspecialchars($newWinePrice);
-		
-		$newCommonMealPrice = trim($_POST["commonmealprice"]);
-		$newCommonMealPrice = stripslashes($newCommonMealPrice);
-		$newCommonMealPrice = htmlspecialchars($newCommonMealPrice);
-		
-		$newFineMealPrice = trim($_POST["finemealprice"]);
-		$newFineMealPrice = stripslashes($newFineMealPrice);
-		$newFineMealPrice = htmlspecialchars($newFineMealPrice);
-		
-		$newAleOrder = trim($_POST["orderale"]);
-		$newAleOrder = stripslashes($newAleOrder);
-		$newAleOrder = htmlspecialchars($newAleOrder);
-		
-		$newWineOrder = trim($_POST["orderwine"]);
-		$newWineOrder = stripslashes($newWineOrder);
-		$newWineOrder = htmlspecialchars($newWineOrder);
-		
-		$newChickenOrder = trim($_POST["orderchicken"]);
-		$newChickenOrder = stripslashes($newChickenOrder);
-		$newChickenOrder = htmlspecialchars($newChickenOrder);
-		
-		$newPigOrder = trim($_POST["orderpig"]);
-		$newPigOrder = stripslashes($newPigOrder);
-		$newPigOrder = htmlspecialchars($newPigOrder);
-		
-		$newCarrotOrder = trim($_POST["ordercarrot"]);
-		$newCarrotOrder = stripslashes($newCarrotOrder);
-		$newCarrotOrder = htmlspecialchars($newCarrotOrder);
-		
-		$newPotatoOrder = trim($_POST["orderpotato"]);
-		$newPotatoOrder = stripslashes($newPotatoOrder);
-		$newPotatoOrder = htmlspecialchars($newPotatoOrder);
-	}
+	$inputArray = array();
+	$inputArray["aleprice"]			= htmlspecialchars(stripslashes(trim($_POST["aleprice"])));
+	$inputArray["wineprice"] 		= htmlspecialchars(stripslashes(trim($_POST["wineprice"])));
+	$inputArray["commonmealprice"]	= htmlspecialchars(stripslashes(trim($_POST["commonmealprice"])));
+	$inputArray["finemealprice"] 	= htmlspecialchars(stripslashes(trim($_POST["finemealprice"])));
+	$inputArray["orderale"]			= htmlspecialchars(stripslashes(trim($_POST["orderale"])));
+	$inputArray["orderwine"] 		= htmlspecialchars(stripslashes(trim($_POST["orderwine"])));
+	$inputArray["orderchicken"]		= htmlspecialchars(stripslashes(trim($_POST["orderchicken"])));
+	$inputArray["orderpig"]			= htmlspecialchars(stripslashes(trim($_POST["orderpig"])));
+	$inputArray["ordercarrot"]		= htmlspecialchars(stripslashes(trim($_POST["ordercarrot"])));
+	$inputArray["orderpotato"]		= htmlspecialchars(stripslashes(trim($_POST["orderpotato"])));
 	
-	if($newAlePrice > 0)
-		$currentGame["ale_price"]=$newAlePrice;
-	if($newWinePrice > 0)
-		$currentGame["wine_price"]=$newWinePrice;
-	if($newCommonMealPrice > 0)
-		$currentGame["common_meal_price"]=$newCommonMealPrice;
-	if($newFineMealPrice > 0)
-		$currentGame["fine_meal_price"]=$newFineMealPrice;
+	if(!empty($inputArray["ale_price"]))
+		$currentGame["ale_price"]=$inputArray["ale_price"];
+	if(!empty($inputArray["wine_price"]))
+		$currentGame["wine_price"]=$inputArray["wine_price"];
 	
 	$currentGame = PickDaysCustomers($currentGame);
 	$currentGame = CheckForShipments($currentGame, $newAleOrder, $newWineOrder);
 	EndDay($currentGame);
 	
 	header("location: ../tavern.php");
+
+
 
 	function OpenCases($currentGame)
 	{
@@ -99,7 +63,7 @@
 			
 			$customer = GetCustomerById($customerId);
 			$customerHappiness = rand (1, 10);
-			$customerStinginess = rand (1, 10);
+			$customerStinginess = rand (1, 3);
 			
 			while ($customerHappiness > 0)
 			{
