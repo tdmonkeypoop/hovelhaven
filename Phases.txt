@@ -1,0 +1,46 @@
+Phase 1:
+*Customers:
+    Random number of patrons 3 - 10
+    drink until happiness drops below 0
+    random happiness 1 - 10
+    random stinginess 1 - 3
+    preferred drink is calculated by drinkPref / totalOfAllDrinkPrefs
+
+*Calculations for happiness
+    profit percent is calculated by (priceOfItem / standardPriceOfItem) - 1.25
+        //Meaning 25% margin is 0 no matter what stinginess
+    totalStingy = itemProfit% * stinginess
+    happiness = happiness - (1 + totalStingy)
+    if happiness is above -5 (drink like normal and see if happiness is above 0 and repeat)
+    if happiness is below -5 (don't drink)
+        //if customer didn't get 1 drink (normally because price too high) they leave angrily
+        
+    
+*Items:
+    Ale $1   Keg $100 x100
+    Wine $2  Barrel $100 x50
+    Starting Money - $100
+    
+    
+Phase 2:
+*Customers:
+    Build a static population of 1,000 people
+    Each person should have a schedule of when they "might" visit based on a calender
+    Their visit should be influenced by past visits (positive or negative)
+    They will look for 1 meal and continuous drinks based on happiness
+    
+*Calculations for happiness
+    
+
+*Calender
+    Holidays, Weekends, Religious or not
+
+*Items:
+    Starting Money - $100
+    Ale     $1  Keg     $100    x100
+    Wine    $2  Barrel  $100    x50
+    Poultry $   Chicken $   x
+    Pork    $   Pig     $   x
+    Carrot  $   Bag     $   x
+    Potato  $   Sack    $   x
+    
