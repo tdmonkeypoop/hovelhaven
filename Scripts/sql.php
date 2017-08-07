@@ -1,91 +1,6 @@
 <?php
 	require ("database.php");
 	
-	function ValidUsername($username)
-	{
-		if (strlen($username) > 2)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	function ValidPassword($password)
-	{
-		if (strlen($password) > 2)
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-
-	function VerifyUser($username, $password)
-	{
-		$db = Database::getInstance();
-
-    	$sql = "SELECT password FROM users where username = '$username' and password = md5('${password}monKey')";
-		$valid_user = $db->query($sql);
-
-		if ($valid_user->num_rows > 0)
-		{
-				return true;
-    	}
-    	else
-    	{
-				return false;
-    	}
-	}
-	
-	function UserExists($username)
-	{
-		$db = Database::getInstance();
-		$sql = "SELECT password FROM users where username = '$username'";
-		$result = $db->query($sql);
-
-		if ($result ->num_rows > 0)
-		{
-			return true;
-		}
-		
-		return false;
-	}
-	
-	function GetUserId($username)
-	{
-		$db = Database::getInstance();
-		$sql = "SELECT id FROM users where username = '$username'";
-		$result = $db->query($sql);
-
-		if ($result ->num_rows > 0)
-		{
-			$row = $result->fetch_assoc();
-			return $row["id"];
-		}
-		
-		return null;
-	}
-	
-	function GetUsername($id)
-	{
-		$db = Database::getInstance();
-		$sql = "SELECT username FROM users where id = '$id'";
-		$result = $db->query($sql);
-
-		if ($result ->num_rows > 0)
-		{
-			$row = $result->fetch_assoc();
-			return $row["username"];
-		}
-		
-		return null;
-	}
-	
 	function GetUserGameId($userId)
 	{
 	    $db = Database::getInstance();
@@ -99,15 +14,6 @@
 		}
 		
 		return null;
-	}
-	
-	function NewUser($username, $password)
-	{
-		$db = Database::getInstance();
-
-		$encryptedPassword = md5($password . "monKey");
-		$sql = "INSERT INTO users (username, password) values ('$username','$encryptedPassword')";
-		$db->query($sql);
 	}
 	
 	function NewGame($userId)
@@ -208,7 +114,7 @@
 		
 	}
 	
-		function GetItemCostByName($name)
+	function GetItemCostByName($name)
 	{
 		$db = Database::getInstance();
 		

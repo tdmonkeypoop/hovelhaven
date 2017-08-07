@@ -28,6 +28,7 @@ Phase 2:
     Each person should have a schedule of when they "might" visit based on a calender
     Their visit should be influenced by past visits (positive or negative)
     They will look for 1 meal and continuous drinks based on happiness
+    Each customer gets a drinktype, foodtype, and a profession
     
 *Calculations for happiness
     
@@ -36,11 +37,11 @@ Phase 2:
     Holidays, Weekends, Religious or not
 
 *Items:
-    Starting Money - $100
-    Ale     $1  Keg     $100    x100
-    Wine    $2  Barrel  $100    x50
-    Poultry $   Chicken $   x
-    Pork    $   Pig     $   x
-    Carrot  $   Bag     $   x
-    Potato  $   Sack    $   x
+    Starting Money - $350
+    Ale     $4  Keg     $116    x29
+    Wine    $8  Bottle  $48     x6
+    Poultry $6  Chicken $24     x4
+    Pork    $8  Pig     $176    x22
+    Carrot  $1  Bag     $10     x10
+    Potato  $1  Sack    $8      x8
     

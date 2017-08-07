@@ -19,15 +19,70 @@
     /*************************************
      * users
      *************************************/
-    $sql = "CREATE TABLE users (id INT AUTO_INCREMENT PRIMARY KEY NOT NULL, username TEXT NOT NULL, password TEXT NOT NULL, gameid INT)";
+    $sql = "CREATE TABLE users (id INT AUTO_INCREMENT PRIMARY KEY NOT NULL, username TEXT NOT NULL, password TEXT NOT NULL)";
     $db->query($sql);
     /*
         id
         username
         password
-        gameid
     */
 
+    /*************************************
+     * games
+     *************************************/
+    $sql = 'CREATE TABLE games (gameid INT, userid INT, currentdate INT, currentmoney INT, unit_ale INT, bulk_ale INT, unit_wine INT, bulk_wine INT, unit_poultry INT, bulk_poultry INT, unit_pork INT, bulk_pork INT, unit_carrot INT, bulk_carrot INT, unit_potato INT, bulk_potato INT, unit_ale_price INT, unit_wine_price INT, `Chicken Wings_price` INT, `Pigs in the Coop_price` INT, `Homestyle Chicken_price` INT, `Chicken Hash_price` INT, `Chicken Pot Pie_price` INT, `Pork Chops_price` INT, `Homestyle Pork_price` INT, `Pork Hash_price` INT, Stew_price INT, `Carrot Broth_price` INT, `Steamed Veggies_price` INT, `Mashed Potatoes_price` INT)';
+    $db->query($sql);
+    /*
+        gameid                      INT
+        userid                      INT
+        currentdate                 INT
+        currentmoney                INT
+        unit_ale                    INT
+        bulk_ale                    INT
+        unit_wine                   INT
+        bulk_wine                   INT
+        unit_poultry                INT
+        bulk_poultry                INT
+        unit_pork                   INT
+        bulk_pork                   INT
+        unit_carrot                 INT
+        bulk_carrot                 INT
+        unit_potato                 INT
+        bulk_potato                 INT
+        unit_ale_price              INT
+        unit_wine_price             INT
+        Chicken Wings_price         INT
+        Pigs in the Coop_price      INT
+        Homestyle Chicken_price     INT
+        Chicken Hash_price          INT
+        Chicken Pot Pie_price       INT
+        Pork Chops_price            INT
+        Homestyle Pork_price        INT
+        Pork Hash_price             INT
+        Stew_price                  INT
+        Carrot Broth_price          INT
+        Steamed Veggies_price       INT
+        Mashed Potatoes_price       INT
+    */
+
+    /*************************************
+     * citizens
+     *************************************/
+    $sql = "CREATE TABLE citizens (gameid INT, first_name TEXT, last_name TEXT, drink_type_id INT, food_type_id INT, profession_id INT, happiness INT, stinginess INT, active BOOL)";
+    $db->query($sql);
+    /*
+        gameid          INT
+        first_name      TEXT
+        last_name       TEXT
+        drink_type_id   INT
+        food_type_id    INT
+        profession_id   INT
+        happiness       INT
+        stinginess      INT
+        active          BOOL
+    */
+    
+    
     /*************************************
      * ledgers
      *************************************/
@@ -38,64 +93,28 @@
         date
         record
     */
-
-    /*************************************
-     * games
-     *************************************/
-    $sql = "CREATE TABLE games (gameid INT, userid INT NOT NULL, currentdate INT NOT NULL, currentmoney DECIMAL(11, 2), mug_ale INT, glass_wine INT, common_meal INT, fine_meal INT, chicken INT, pork_chop INT, carrot INT, potato INT, barrel_wine INT, keg_ale INT, full_chicken INT, pig INT, carrot_bag INT, potato_sack INT, mug_ale_price DECIMAL(6,2), glass_wine_price DECIMAL(6,2), common_meal_price DECIMAL(6,2), fine_meal_price DECIMAL(6,2))";
-    $db->query($sql);
-    /*
-        gameid
-        userid
-        currentdate
-        currentmoney
-        mug_ale
-        glass_wine
-        common_meal
-        fine_meal
-        chicken
-        pork_chop
-        carrot
-        potato
-        barrel_wine
-        keg_ale
-        full_chicken
-        pig
-        carrot_bag
-        potato_sack
-        mug_ale_price
-        glass_wine_price
-        common_meal_price
-        fine_meal_price
-    */
     
     /*************************************
      * items
      *************************************/
-    $sql = "CREATE TABLE items (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, cost DECIMAL(6,2) NOT NULL, qty INT)";
+    $sql = "CREATE TABLE items (id INT PRIMARY KEY AUTO_INCREMENT, unit_name TEXT, unit_cost INT, bulk_name TEXT, bulk_cost INT, bulk_qty INT)";
     $db->query($sql);
     /*
-        id
-        name
-        cost
-        qty
+        id          INT PKEY
+        unit_name   TEXT
+        unit_cost   INT
+        bulk_name   TEXT
+        bulk_cost   INT
+        bulk_qty    INT
     */
     
     $items = array();
-    $items[] = [1,  '"mug_ale"',      1,      1];
-    $items[] = [2,  '"glass_wine"',   2,      1];
-    $items[] = [3,  '"common_meal"',  0.30,   1];
-    $items[] = [4,  '"fine_meal"',    0.70,   1];
-    $items[] = [5,  '"chicken"',      0.20,   1];
-    $items[] = [6,  '"pork_chop"',    0.3,    1];
-    $items[] = [7,  '"carrot"',       0.05,   1];
-    $items[] = [8,  '"potato"',       0.03,   1];
-    $items[] = [9,  '"barrel_wine"',  100,    50];
-    $items[] = [10, '"keg_ale"',      100,    100];
-    $items[] = [11, '"full_chicken"', 1,      4];
-    $items[] = [12, '"pig"',          3.1,    8];
-    $items[] = [13, '"carrot_bag"',   1,      12];
-    $items[] = [14, '"potato_sack"',  1,      20];
+    $items[] = [1,  '"Mug of Ale"',     4,  '"Keg of Ale"',         116,    29];
+    $items[] = [2,  '"Glass of Wine"',  8,  '"Bottle of Wine"',     48,     48];
+    $items[] = [3,  '"Poultry"',        6,  '"Chicken"',            24,     24];
+    $items[] = [4,  '"Pork"',           8,  '"Pig"',                176,    22];
+    $items[] = [5,  '"Carrot"',         1,  '"Bag of Carrots"',     10,     10];
+    $items[] = [6,  '"Potato"',         1,  '"Sack of Potatoes"',   8,      8];
     
     $itemsImploded = array();
     for($i = 0; $i < count($items); $i++)
@@ -105,61 +124,462 @@
 
     $sql = "INSERT INTO items VALUES" . implode(',',$itemsImploded);
     $db->query($sql);
-
-
+    
     /*************************************
-     * customers
+     * recipes
      *************************************/
-    $sql = "CREATE TABLE customers (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, ale_pref INT, wine_pref INT, chicken_pref INT, pork_chop_pref INT, carrot_pref INT, potato_pref INT)";
+    $sql = "CREATE TABLE recipes (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, Poultry_qty INT, Pork_qty INT, Carrot_qty INT, Potato_qty INT)";
+    $db->query($sql);
+     
+    /*
+        id              INT PKEY
+        name            TEXT
+        Poultry_qty     INT
+        Pork_qty        INT
+        Carrot_qty      INT
+        Potato_qty      INT
+    */
+    
+    $recipes[] = [1,  "'Chicken Wings'",     1, 0, 0, 0];
+    $recipes[] = [2,  "'Pigs in the Coop'",  1, 1, 0, 0];
+    $recipes[] = [3,  "'Homestyle Chicken'", 1, 0, 1, 0];
+    $recipes[] = [4,  "'Chicken Hash'",      1, 0, 0, 1];
+    $recipes[] = [5,  "'Chicken Pot Pie'",   1, 0, 1, 1];
+    $recipes[] = [6,  "'Pork Chops'",        0, 1, 0, 0];
+    $recipes[] = [7,  "'Homestyle Pork'",    0, 1, 1, 0];
+    $recipes[] = [8,  "'Pork Hash'",         0, 1, 0, 1];
+    $recipes[] = [9,  "'Stew'",              0, 1, 1, 1];
+    $recipes[] = [10, "'Carrot Broth'",      0, 0, 1, 0];
+    $recipes[] = [11, "'Steamed Veggies'",   0, 0, 1, 1];
+    $recipes[] = [12, "'Mashed Potatoes'",   0, 0, 0, 1];
+    
+    $recipesImploded = array();
+    for($i = 0; $i < count($recipes); $i++)
+    {
+        $recipesImploded[] = "(" . implode(',', $recipes[$i]) . ")";
+    }
+
+    $sql = "INSERT INTO recipes VALUES" . implode(',',$recipesImploded);
+    $db->query($sql);
+     
+    /*************************************
+     * foodtypes
+     *************************************/
+    $sql = "CREATE TABLE foodtypes (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, chicken_pref INT, pork_chop_pref INT, carrot_pref INT, potato_pref INT)";
     $db->query($sql);
     /*
-        id
-        name
-        ale_pref
-        wine_pref
-        chicken_pref
-        pork_pref
-        carrot_pref
-        potato_pref
+        id              INT PKEY
+        name            TEXT
+        chicken_pref    INT
+        pork_pref       INT
+        carrot_pref     INT
+        potato_pref     INT
     */
-
-    $customers[] = [1, '"common"',    2, 1, 1, 1, 5, 5];
-    $customers[] = [2, '"wealthy"',   1, 3, 5, 5, 1, 1];
-    $customers[] = [3, '"drunk"',     5, 1, 0, 0, 0, 0];
     
-    $customersImploded = array();
-    for($i = 0; $i < count($customers); $i++)
+    $foodTypes = array();
+    $foodTypes[] = [1, '"Vegetarian"',      0, 0, 1, 1];
+    $foodTypes[] = [2, '"Meat Lover"',      1, 1, 0, 0];
+    $foodTypes[] = [3, '"Muslim"',          1, 0, 1, 1];
+    $foodTypes[] = [4, '"Porker"',          0, 1, 0, 1];
+    $foodTypes[] = [5, '"Rabbit"',          0, 0, 1, 0];
+    
+    $foodTypesImploded = array();
+    for($i = 0; $i < count($foodTypes); $i++)
     {
-        $customersImploded[] = "(" . implode(',', $customers[$i]) . ")";
+        $foodTypesImploded[] = "(" . implode(',', $foodTypes[$i]) . ")";
     }
     
-    $sql = "INSERT INTO customers VALUES" . implode(',',$customersImploded);
+    $sql = "INSERT INTO foodtypes VALUES" . implode(',',$foodTypesImploded);
+    $db->query($sql);
+    
+    /*************************************
+     * drinktypes
+     *************************************/
+    $sql = "CREATE TABLE drinktypes (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, ale_pref INT, wine_pref INT)";
+    $db->query($sql);
+    /*
+        id              INT PKEY
+        name            TEXT
+        ale_pref        INT
+        wine_pref       INT
+    */
+
+    $drinkTypes = array();
+    $drinkTypes[] = [1, '"Drunk"',          5, 1];
+    $drinkTypes[] = [2, '"Oenophiliac"',    1, 5];
+    $drinkTypes[] = [3, '"Standard"',       1, 1];
+    
+    $drinkTypesImploded = array();
+    for($i = 0; $i < count($drinkTypes); $i++)
+    {
+        $drinkTypesImploded[] = "(" . implode(',', $drinkTypes[$i]) . ")";
+    }
+    
+    $sql = "INSERT INTO drinktypes VALUES" . implode(',',$drinkTypesImploded);
+    $db->query($sql);
+    
+    /*************************************
+     * professions
+     *************************************/
+    $sql = "CREATE TABLE professions (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, daily_wage INT, allowance_for_food INT, religious INT)";
+    $db->query($sql);
+    /*
+        id                      INT PKEY
+        name                    TEXT
+        daily_wage              INT
+        allowance_for_food      INT
+        religious               INT (Scale of 1 - 10)
+    */
+    
+    $professions = array();
+    $professions[] = [1, '"Laborer"', 9, 7, 5];
+    
+    $professionsImploded = array();
+    for($i = 0; $i < count($professions); $i++)
+    {
+        $professionsImploded[] = "(" . implode(',', $professions[$i]) . ")";
+    }
+    
+    $sql = "INSERT INTO professions VALUES" . implode(',',$professionsImploded);
     $db->query($sql);
     
     /*************************************
      * calender
      *************************************/
-    $sql = "CREATE TABLE calender (date INT, name TEXT NOT NULL, religious BOOL)";
+    $sql = "CREATE TABLE calendar (date INT, name TEXT NOT NULL, religious BOOL)";
     $db->query($sql);
+    /*
+        date        INT
+        name        INT
+        religious   BOOL
+    */
 
-    $calender[] = [1, "'newYear'", 0];
-    $calender[] = [5, "'weekend'", 0];
-    $calender[] = [6, "'Helms Day'", 1];
-    $calender[] = [6, "'dragons day'", 0];
-    $calender[] = [11, "'weekend'", 0];
-    $calender[] = [12, "'Helms Day'", 1];
-    $calender[] = [17, "'weekend'", 0];
-    $calender[] = [18, "'Helms Day'", 1];
-    $calender[] = [23, "'weekend'", 0];
-    $calender[] = [24, "'Helms Day'", 1];
-    $calender[] = [29, "'weekend'", 0];
-    $calender[] = [30, "'Helms Day'", 1];
+    $calendar = array();
     
-    $calenderImploded = array();
-    for($i = 0; $i < count($calender); $i++)
+    //Weekends and "Sabbath"
+    for($i = 6; $i <= 360; $i = $i + 6)
     {
-        $calenderImploded[] = "(" . implode(',', $calender[$i]) . ")";
+        $calendar[] = [$i - 1,  "'Weekend'",                0];
+        $calendar[] = [$i,      "'Helm\'s Day'",            1];    
     }
     
-    $sql = "INSERT INTO calender VALUES" . implode(',',$calenderImploded);
+    //Holidays
+    $calendar[] = [1,           "'New Year'",               0];
+    $calendar[] = [16,          "'Martin Luther King'",     0];
+    $calendar[] = [44,          "'Valentine\'s Day'",       0];
+    $calendar[] = [148,         "'Memorial Day'",           0];
+    $calendar[] = [184,         "'Independance Day'",       0];
+    $calendar[] = [244,         "'Labor Day'",              0];
+    $calendar[] = [279,         "'Columbus Day'",           0];
+    $calendar[] = [310,         "'Veterans Day'",           0];
+    $calendar[] = [321,         "'Thanksgiving Eve'",       0];
+    $calendar[] = [322,         "'Thanksgiving Day'",       0];
+    $calendar[] = [355,         "'Christmas Eve'",          1];
+    $calendar[] = [356,         "'Christmas Day'",          1];
+    
+    $calendarImploded = array();
+    for($i = 0; $i < count($calendar); $i++)
+    {
+        $calendarImploded[] = "(" . implode(',', $calendar[$i]) . ")";
+    }
+    
+    $sql = "INSERT INTO calendar VALUES" . implode(',',$calendarImploded);
     $db->query($sql);
+    
+    /*************************************
+     * firstnames
+     *************************************/
+    $sql = "CREATE TABLE firstnames (id INT PRIMARY KEY AUTO_INCREMENT, first_name TEXT)";
+    $db->query($sql);
+    /*
+        id          INT PKEY
+        first_name  TEXT
+    */
+    
+    $firstNames = array();
+    $firstNames[] = "('Abrielle')";
+    $firstNames[] = "('Adair')";
+    $firstNames[] = "('Adara')";
+    $firstNames[] = "('Adriel')";
+    $firstNames[] = "('Aiyana')";
+    $firstNames[] = "('Alissa')";
+    $firstNames[] = "('Alixandra')";
+    $firstNames[] = "('Altair')";
+    $firstNames[] = "('Amara')";
+    $firstNames[] = "('Anatola')";
+    $firstNames[] = "('Anya')";
+    $firstNames[] = "('Arcadia')";
+    $firstNames[] = "('Ariadne')";
+    $firstNames[] = "('Arianwen')";
+    $firstNames[] = "('Aurelia')";
+    $firstNames[] = "('Aurelian')";
+    $firstNames[] = "('Aurelius')";
+    $firstNames[] = "('Avalon')";
+    $firstNames[] = "('Acalia')";
+    $firstNames[] = "('Alaire')";
+    $firstNames[] = "('Auristela')";
+    $firstNames[] = "('Bastian')";
+    $firstNames[] = "('Breena')";
+    $firstNames[] = "('Brielle')";
+    $firstNames[] = "('Briallan')";
+    $firstNames[] = "('Briseis')";
+    $firstNames[] = "('Cambria')";
+    $firstNames[] = "('Cara')";
+    $firstNames[] = "('Carys')";
+    $firstNames[] = "('Caspian')";
+    $firstNames[] = "('Cassia')";
+    $firstNames[] = "('Cassiel')";
+    $firstNames[] = "('Cassiopeia')";
+    $firstNames[] = "('Cassius')";
+    $firstNames[] = "('Chaniel')";
+    $firstNames[] = "('Cora')";
+    $firstNames[] = "('Corbin')";
+    $firstNames[] = "('Cyprian')";
+    $firstNames[] = "('Daire')";
+    $firstNames[] = "('Darius')";
+    $firstNames[] = "('Destin')";
+    $firstNames[] = "('Drake')";
+    $firstNames[] = "('Drystan')";
+    $firstNames[] = "('Dagen')";
+    $firstNames[] = "('Devlin')";
+    $firstNames[] = "('Devlyn')";
+    $firstNames[] = "('Eira')";
+    $firstNames[] = "('Eirian')";
+    $firstNames[] = "('Elysia')";
+    $firstNames[] = "('Eoin')";
+    $firstNames[] = "('Evadne')";
+    $firstNames[] = "('Eliron')";
+    $firstNames[] = "('Evanth')";
+    $firstNames[] = "('Fineas')";
+    $firstNames[] = "('Finian')";
+    $firstNames[] = "('Fyodor')";
+    $firstNames[] = "('Gareth')";
+    $firstNames[] = "('Gavriel')";
+    $firstNames[] = "('Griffin')";
+    $firstNames[] = "('Guinevere')";
+    $firstNames[] = "('Gaerwn')";
+    $firstNames[] = "('Ginerva')";
+    $firstNames[] = "('Hadriel')";
+    $firstNames[] = "('Hannelore')";
+    $firstNames[] = "('Hermione')";
+    $firstNames[] = "('Hesperos')";
+    $firstNames[] = "('Iagan')";
+    $firstNames[] = "('Ianthe')";
+    $firstNames[] = "('Ignacia')";
+    $firstNames[] = "('Ignatius')";
+    $firstNames[] = "('Iseult')";
+    $firstNames[] = "('Isolde')";
+    $firstNames[] = "('Jessalyn')";
+    $firstNames[] = "('Kara')";
+    $firstNames[] = "('Kerensa')";
+    $firstNames[] = "('Korbin')";
+    $firstNames[] = "('Kyler')";
+    $firstNames[] = "('Kyra')";
+    $firstNames[] = "('Katriel')";
+    $firstNames[] = "('Kyrielle')";
+    $firstNames[] = "('Leala')";
+    $firstNames[] = "('Leila')";
+    $firstNames[] = "('Lilith')";
+    $firstNames[] = "('Liora')";
+    $firstNames[] = "('Lucien')";
+    $firstNames[] = "('Lyra')";
+    $firstNames[] = "('Leira')";
+    $firstNames[] = "('Liriene')";
+    $firstNames[] = "('Liron')";
+    $firstNames[] = "('Maia')";
+    $firstNames[] = "('Marius')";
+    $firstNames[] = "('Mathieu')";
+    $firstNames[] = "('Mireille')";
+    $firstNames[] = "('Mireya')";
+    $firstNames[] = "('Maylea')";
+    $firstNames[] = "('Meira')";
+    $firstNames[] = "('Natania')";
+    $firstNames[] = "('Nerys')";
+    $firstNames[] = "('Nuriel')";
+    $firstNames[] = "('Nyssa')";
+    $firstNames[] = "('Neirin')";
+    $firstNames[] = "('Nyfain')";
+    $firstNames[] = "('Oisin')";
+    $firstNames[] = "('Oralie')";
+    $firstNames[] = "('Orion')";
+    $firstNames[] = "('Orpheus')";
+    $firstNames[] = "('Ozara')";
+    $firstNames[] = "('Oleisa')";
+    $firstNames[] = "('Orinthea')";
+    $firstNames[] = "('Peregrine')";
+    $firstNames[] = "('Persephone')";
+    $firstNames[] = "('Perseus')";
+    $firstNames[] = "('Petronela')";
+    $firstNames[] = "('Phelan')";
+    $firstNames[] = "('Pryderi')";
+    $firstNames[] = "('Pyralia')";
+    $firstNames[] = "('Pyralis')";
+    $firstNames[] = "('Qadira')";
+    $firstNames[] = "('Quintessa')";
+    $firstNames[] = "('Quinevere')";
+    $firstNames[] = "('Raisa')";
+    $firstNames[] = "('Remus')";
+    $firstNames[] = "('Rhyan')";
+    $firstNames[] = "('Rhydderch')";
+    $firstNames[] = "('Riona')";
+    $firstNames[] = "('Renfrew')";
+    $firstNames[] = "('Saoirse')";
+    $firstNames[] = "('Sarai')";
+    $firstNames[] = "('Sebastian')";
+    $firstNames[] = "('Seraphim')";
+    $firstNames[] = "('Seraphina')";
+    $firstNames[] = "('Sirius')";
+    $firstNames[] = "('Sorcha')";
+    $firstNames[] = "('Saira')";
+    $firstNames[] = "('Sarielle')";
+    $firstNames[] = "('Serian')";
+    $firstNames[] = "('Séverin')";
+    $firstNames[] = "('Tavish')";
+    $firstNames[] = "('Tearlach')";
+    $firstNames[] = "('Terra')";
+    $firstNames[] = "('Thalia')";
+    $firstNames[] = "('Thaniel')";
+    $firstNames[] = "('Theia')";
+    $firstNames[] = "('Torian')";
+    $firstNames[] = "('Torin')";
+    $firstNames[] = "('Tressa')";
+    $firstNames[] = "('Tristana')";
+    $firstNames[] = "('Uriela')";
+    $firstNames[] = "('Urien')";
+    $firstNames[] = "('Ulyssia')";
+    $firstNames[] = "('Vanora')";
+    $firstNames[] = "('Vespera')";
+    $firstNames[] = "('Vasilis')";
+    $firstNames[] = "('Xanthus')";
+    $firstNames[] = "('Xara')";
+    $firstNames[] = "('Xylia')";
+    $firstNames[] = "('Yadira')";
+    $firstNames[] = "('Yseult')";
+    $firstNames[] = "('Yakira')";
+    $firstNames[] = "('Yeira')";
+    $firstNames[] = "('Yeriel')";
+    $firstNames[] = "('Yestin')";
+    $firstNames[] = "('Zaira')";
+    $firstNames[] = "('Zephyr')";
+    $firstNames[] = "('Zora')";
+    $firstNames[] = "('Zorion')";
+    $firstNames[] = "('Zaniel')";
+    $firstNames[] = "('Zarek')";
+    
+    $sql = "INSERT INTO firstnames (first_name) VALUES" . implode(',', $firstNames);
+    $db->query($sql);
+    
+    /*************************************
+     * lastnames
+     *************************************/
+    $sql = "CREATE TABLE lastnames (id INT PRIMARY KEY AUTO_INCREMENT, last_name TEXT)";
+    $db->query($sql);
+    /*
+        id          INT PKEY
+        last_name  TEXT
+    */
+    
+    $lastNames[] = "('Thoraded')";
+    $lastNames[] = "('Gilar')";
+    $lastNames[] = "('Balkral')";
+    $lastNames[] = "('Baern')";
+    $lastNames[] = "('Agamm')";
+    $lastNames[] = "('Toror')";
+    $lastNames[] = "('Gegkas')";
+    $lastNames[] = "('Thorar')";
+    $lastNames[] = "('Bofan')";
+    $lastNames[] = "('Yedorn')";
+    $lastNames[] = "('Vonlar')";
+    $lastNames[] = "('Ogar')";
+    $lastNames[] = "('Thorbar')";
+    $lastNames[] = "('Renag')";
+    $lastNames[] = "('Mogain')";
+    $lastNames[] = "('Rogi')";
+    $lastNames[] = "('Garn')";
+    $lastNames[] = "('Taldam')";
+    $lastNames[] = "('Farur')";
+    $lastNames[] = "('Matlo')";
+    $lastNames[] = "('Renar')";
+    $lastNames[] = "('Banir')";
+    $lastNames[] = "('Falthal')";
+    $lastNames[] = "('Ril')";
+    $lastNames[] = "('Boroag')";
+    $lastNames[] = "('Valdtor')";
+    $lastNames[] = "('Keldar')";
+    $lastNames[] = "('Galgrat')";
+    $lastNames[] = "('Gnok')";
+    $lastNames[] = "('Gilerl')";
+    $lastNames[] = "('Danseg')";
+    $lastNames[] = "('Gehgrim')";
+    $lastNames[] = "('Valdar')";
+    $lastNames[] = "('Nalrak')";
+    $lastNames[] = "('Taig')";
+    $lastNames[] = "('Vardar')";
+    $lastNames[] = "('Thir')";
+    $lastNames[] = "('Khondlim')";
+    $lastNames[] = "('Barungrim')";
+    $lastNames[] = "('Gimur')";
+    $lastNames[] = "('Rigur')";
+    $lastNames[] = "('Hathur')";
+    $lastNames[] = "('Duerthal')";
+    $lastNames[] = "('Varan')";
+    $lastNames[] = "('Madik')";
+    $lastNames[] = "('Gorlel')";
+    $lastNames[] = "('Kaldersun')";
+    $lastNames[] = "('Galar')";
+    $lastNames[] = "('Thorur')";
+    $lastNames[] = "('Durel')";
+    $lastNames[] = "('Donur')";
+    $lastNames[] = "('Ovtak')";
+    $lastNames[] = "('Arof')";
+    $lastNames[] = "('Maegan')";
+    $lastNames[] = "('Torlo')";
+    $lastNames[] = "('Galar')";
+    $lastNames[] = "('Yerdel')";
+    $lastNames[] = "('Badar')";
+    $lastNames[] = "('Gladgar')";
+    $lastNames[] = "('Del')";
+    $lastNames[] = "('Orag')";
+    $lastNames[] = "('Belkhan')";
+    $lastNames[] = "('Azrimm')";
+    $lastNames[] = "('Gordrin')";
+    $lastNames[] = "('Fultut')";
+    $lastNames[] = "('Berdo')";
+    $lastNames[] = "('Havdar')";
+    $lastNames[] = "('Halvic')";
+    $lastNames[] = "('Whurthal')";
+    $lastNames[] = "('Bazgen')";
+    $lastNames[] = "('Kilor')";
+    $lastNames[] = "('Babtur')";
+    $lastNames[] = "('Baergdas')";
+    $lastNames[] = "('Barunak')";
+    $lastNames[] = "('Zuth')";
+    $lastNames[] = "('Thirdan')";
+    $lastNames[] = "('Manar')";
+    $lastNames[] = "('Cael')";
+    $lastNames[] = "('Maedok')";
+    $lastNames[] = "('Baerggar')";
+    $lastNames[] = "('Balseg')";
+    $lastNames[] = "('Yab')";
+    $lastNames[] = "('Barunhof')";
+    $lastNames[] = "('Damir')";
+    $lastNames[] = "('Garnlo')";
+    $lastNames[] = "('Galli')";
+    $lastNames[] = "('Garnut')";
+    $lastNames[] = "('Nalgan')";
+    $lastNames[] = "('Babdok')";
+    $lastNames[] = "('Donir')";
+    $lastNames[] = "('Thirir')";
+    $lastNames[] = "('Torgag')";
+    $lastNames[] = "('Ril')";
+    $lastNames[] = "('Belur')";
+    $lastNames[] = "('Gomglad')";
+    $lastNames[] = "('Rogi')";
+    $lastNames[] = "('Gomggug')";
+    $lastNames[] = "('Baern')";
+    $lastNames[] = "('Gimthic')";
+    $lastNames[] = "('Yerlak')";
+    
+    $sql = "INSERT INTO lastnames (last_name) VALUES" . implode(',', $lastNames);
+    $db->query($sql);
+    

@@ -1,6 +1,9 @@
 <?php
 	session_start();
 	
+	$previousURI = $_SESSION['CurrentURI'];
+	$_SESSION['CurrentURI'] = $_SERVER['REQUEST_URI'];
+	
 	if (!empty($_SESSION["userId"]))
 	{
 		header("location: tavern.php");
