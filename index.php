@@ -29,9 +29,10 @@
       			<input type="password" placeholder="Enter Password" name="psw" required>
       			<?php
       			if (!empty($_SESSION["error"]))
-	      			{
-	      				echo "<div class='errorMessage'>".$_SESSION['error']."</div>";
-	      			}
+      			{
+	      			echo "<div class='errorMessage'>".$_SESSION['error']."</div>";
+      			}
+	      		unset($_SESSION["error"]);
       			?>
 		      <button type="submit">Login</button>		      
 		    </div>

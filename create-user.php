@@ -32,6 +32,7 @@
 	      			{
 	      				echo "<div class='errorMessage'>".$_SESSION['error']."</div>";
 	      			}
+	      			unset($_SESSION["error"]);
       			?>
 		      <button type="submit">Create Account</button>		      
 		    </div>

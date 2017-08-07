@@ -8,10 +8,8 @@
 	$_SESSION['CurrentURI'] = $_SERVER['REQUEST_URI'];
 
 	$previousURIPieces = explode('/', $previousURI);
-	$previousURIPiecesCount = count($previousURIPieces);
-	$previousURI = $previousURIPieces[$previousURIPiecesCount - 1];
-	
-	unset($_SESSION["error"]);
+	$previousURIPiecesCount = count($previousURIPieces) -1;
+	$previousURI = $previousURIPieces[$previousURIPiecesCount];
     
 	if($_SERVER["REQUEST_METHOD"] == "POST")
 	{

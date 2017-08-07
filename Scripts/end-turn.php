@@ -6,7 +6,7 @@
 	
 	if (empty($_SESSION["userId"]))
 	{
-		header("location: ../login.php");
+		header("location: ../index.php");
 	}
 	
 	$currentGame = GetCurrentGame($_SESSION["gameId"]);
