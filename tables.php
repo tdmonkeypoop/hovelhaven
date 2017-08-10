@@ -108,12 +108,12 @@
     */
     
     $items = array();
-    $items[] = [1,  '"Mug of Ale"',     4,  '"Keg of Ale"',         116,    29];
-    $items[] = [2,  '"Glass of Wine"',  8,  '"Bottle of Wine"',     48,     48];
-    $items[] = [3,  '"Poultry"',        6,  '"Chicken"',            24,     24];
-    $items[] = [4,  '"Pork"',           8,  '"Pig"',                176,    22];
-    $items[] = [5,  '"Carrot"',         1,  '"Bag of Carrots"',     10,     10];
-    $items[] = [6,  '"Potato"',         1,  '"Sack of Potatoes"',   8,      8];
+    $items[] = [1,  '"unit_ale"',     4,  '"bulk_ale"',      116,    29];
+    $items[] = [2,  '"unit_wine"',    8,  '"bulk_wine"',     48,     48];
+    $items[] = [3,  '"unit_poultry"', 6,  '"bulk_poultry"',  24,     24];
+    $items[] = [4,  '"unit_pork"',    8,  '"bulk_pork"',     176,    22];
+    $items[] = [5,  '"unit_carrot"',  1,  '"bulk_carrot"',   10,     10];
+    $items[] = [6,  '"unit_potato"',  1,  '"bulk_potato"',   8,      8];
     
     $itemsImploded = array();
     for($i = 0; $i < count($items); $i++)

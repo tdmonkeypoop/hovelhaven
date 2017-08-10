@@ -1,63 +1,54 @@
 <?php
 	session_start();
 
-	require("sql.php");
-	//require("database.php");
+	require("database.php");
 	
 	if (empty($_SESSION["userId"]))
 	{
 		header("location: ../index.php");
 	}
 	
-	$currentGame = GetCurrentGame($_SESSION["userId"]);
 	
-	$inputArray = array();
-	$currentGame["unit_ale_price"]		= htmlspecialchars(stripslashes(trim($_POST["unitAlePrice"])));
-	$currentGame["unit_wine_price"] 	= htmlspecialchars(stripslashes(trim($_POST["unitWineprice"])));
-	$currentGame["Chicken Wings_price"]	= htmlspecialchars(stripslashes(trim($_POST["chickenWingsPrice"])));
-	$currentGame["Pigs in the Coop_price"]	= htmlspecialchars(stripslashes(trim($_POST["pigsInTheCoopPrice"])));
-	$currentGame["Homestyle Chicken_price"]	= htmlspecialchars(stripslashes(trim($_POST["homestyleChickenPrice"])));
-	$currentGame["Chicken Hash_price"]	= htmlspecialchars(stripslashes(trim($_POST["chickenHashPrice"])));
-	$currentGame["Chicken Pot Pie_price"]	= htmlspecialchars(stripslashes(trim($_POST["chickenPotPiePrice"])));
-	$currentGame["Pork Chops_price"]	= htmlspecialchars(stripslashes(trim($_POST["porkChopsPrice"])));
-	$currentGame["Homestyle Pork_price"]	= htmlspecialchars(stripslashes(trim($_POST["homestylePorkPrice"])));
-	$currentGame["Pork Hash_price"]	= htmlspecialchars(stripslashes(trim($_POST["porkHashPrice"])));
-	$currentGame["Stew_price"]	= htmlspecialchars(stripslashes(trim($_POST["stewPrice"])));
-	$currentGame["Carrot Broth_price"]	= htmlspecialchars(stripslashes(trim($_POST["carrotBrothPrice"])));
-	$currentGame["Steamed Veggies_price"]	= htmlspecialchars(stripslashes(trim($_POST["steamedVeggiesPrice"])));
-	$currentGame["Mashed Potatoes_price"]	= htmlspecialchars(stripslashes(trim($_POST["mashedPotatoesPrice"])));
-	$inputArray["orderale"]				= htmlspecialchars(stripslashes(trim($_POST["orderale"])));
-	$inputArray["orderwine"] 			= htmlspecialchars(stripslashes(trim($_POST["orderwine"])));
-	$inputArray["orderchicken"]			= htmlspecialchars(stripslashes(trim($_POST["orderchicken"])));
-	$inputArray["orderpig"]				= htmlspecialchars(stripslashes(trim($_POST["orderpig"])));
-	$inputArray["ordercarrot"]			= htmlspecialchars(stripslashes(trim($_POST["ordercarrot"])));
-	$inputArray["orderpotato"]			= htmlspecialchars(stripslashes(trim($_POST["orderpotato"])));
-	
-	$currentGame = PickDaysCustomers($currentGame);
-	$currentGame = CheckForShipments($currentGame, $inputArray["orderale"], $inputArray["orderwine"]);
-	EndDay($currentGame);
-	
-	header("location: ../tavern.php");
-
-	function OpenCases($currentGame)
+	if ($_SERVER['REQUEST_METHOD'] === 'POST')
 	{
-		if($currentGame["unit_ale"] == 0 && $currentGame["bulk_ale"] > 0)
-		{
-			$currentGame["bulk_ale"]--;
-			$currentGame["unit_ale"] = GetItemQtyByName("bulk_ale");
-		}
+		$currentGame = GetCurrentGame($_SESSION["userId"]);
 		
-		if($currentGame["unit_wine"] == 0 && $currentGame["bulk_wine"] > 0)
-		{
-			$currentGame["bulk_wine"]--;
-			$currentGame["unit_wine"] = GetItemQtyByName("bulk_wine");
-		}
+		$inputArray = array();
+		$currentGame["unit_ale_price"]			= htmlspecialchars(stripslashes(trim($_POST["unitAlePrice"])));
+		$currentGame["unit_wine_price"] 		= htmlspecialchars(stripslashes(trim($_POST["unitWineprice"])));
+		$currentGame["Chicken Wings_price"]		= htmlspecialchars(stripslashes(trim($_POST["chickenWingsPrice"])));
+		$currentGame["Pigs in the Coop_price"]	= htmlspecialchars(stripslashes(trim($_POST["pigsInTheCoopPrice"])));
+		$currentGame["Homestyle Chicken_price"]	= htmlspecialchars(stripslashes(trim($_POST["homestyleChickenPrice"])));
+		$currentGame["Chicken Hash_price"]		= htmlspecialchars(stripslashes(trim($_POST["chickenHashPrice"])));
+		$currentGame["Chicken Pot Pie_price"]	= htmlspecialchars(stripslashes(trim($_POST["chickenPotPiePrice"])));
+		$currentGame["Pork Chops_price"]		= htmlspecialchars(stripslashes(trim($_POST["porkChopsPrice"])));
+		$currentGame["Homestyle Pork_price"]	= htmlspecialchars(stripslashes(trim($_POST["homestylePorkPrice"])));
+		$currentGame["Pork Hash_price"]			= htmlspecialchars(stripslashes(trim($_POST["porkHashPrice"])));
+		$currentGame["Stew_price"]				= htmlspecialchars(stripslashes(trim($_POST["stewPrice"])));
+		$currentGame["Carrot Broth_price"]		= htmlspecialchars(stripslashes(trim($_POST["carrotBrothPrice"])));
+		$currentGame["Steamed Veggies_price"]	= htmlspecialchars(stripslashes(trim($_POST["steamedVeggiesPrice"])));
+		$currentGame["Mashed Potatoes_price"]	= htmlspecialchars(stripslashes(trim($_POST["mashedPotatoesPrice"])));
+		$inputArray["orderale"]					= htmlspecialchars(stripslashes(trim($_POST["orderale"])));
+		$inputArray["orderwine"] 				= htmlspecialchars(stripslashes(trim($_POST["orderwine"])));
+		$inputArray["orderchicken"]				= htmlspecialchars(stripslashes(trim($_POST["orderchicken"])));
+		$inputArray["orderpig"]					= htmlspecialchars(stripslashes(trim($_POST["orderpig"])));
+		$inputArray["ordercarrot"]				= htmlspecialchars(stripslashes(trim($_POST["ordercarrot"])));
+		$inputArray["orderpotato"]				= htmlspecialchars(stripslashes(trim($_POST["orderpotato"])));
 		
-		return $currentGame;
+		//GetReturningCustomers
+		//GetNewCustomers
+		//RunDaysTotals
+		//ReceiveOrders(if Monday)
+		//RecordCustomers
+		RecordDay();
+		
+		header("location: ../tavern.php");
 	}
-
-	function PickDaysCustomers($currentGame)
+	
+	function PickDaysCustomers()
 	{
+		global $currentGame;
+		
 		$numberOfCustomers	= CalculateNumberOfCustomers();
 		$aleProfitPercent	= ($currentGame["unit_ale_price"] / GetItemCostByName("unit_ale")) - 1.25;
 		$wineProfitPercent	= ($currentGame["unit_wine_price"] / GetItemCostByName("unit_wine")) - 1.25;
@@ -146,66 +137,67 @@
 				}
 			}
 		}
-		
-		return $currentGame;
 	}
 	
-	function GiveCustomerAle($currentGame)
+	function GiveCustomerAle()
 	{
+		global $currentGame;
+		
 		$currentGame['unit_ale']--;
 		$currentGame['current_money'] += $currentGame['unit_ale_price'];
-		
-		return $currentGame;
 	}
 	
-	function GiveCustomerWine($currentGame)
+	function GiveCustomerWine()
 	{
+		global $currentGame;
+		
 		$currentGame['unit_wine']--;
 		$currentGame['current_money'] += $currentGame['glass_wine_price'];
-		
-		return $currentGame;
 	}
 	
 	function CreateCustomer()
 	{
-		$uniqueCustomers = GetCustomerTypes();
+		/*$uniqueCustomers = GetCustomerTypes();
 			
 		$newCustomer = GetCustomerById(rand(1, $uniqueCustomers));
 		$newCustomer['happiness'] = rand (1, 10);
 		$newCustomer['stinginess'] = rand (1, 3);
 		
-		return $newCustomer;
+		return $newCustomer;*/
 	}
 	
 	function CalculateNumberOfCustomers()
 	{
-		return rand(3, 10);
+		return 0;//rand(3, 10);
 	}
 	
 	function GetCustomerTypes()
 	{
-		$db = Database::getInstance();
+		//$db = Database::getInstance();
 		
-		$sql = "SELECT id FROM customers";
-		$result = $db->query($sql);
+		//$sql = "SELECT id FROM customers";
+		//$result = $db->query($sql);
 
-		return mysqli_num_rows($result);
+		//return mysqli_num_rows($result);
 	}
 	
 	function GetCustomerById($id)
 	{
-		$db = Database::getInstance();
+		//$db = Database::getInstance();
 		
-		$sql = "SELECT * FROM customers WHERE id = '$id'";
-		$customer = $db->query($sql);
+		//$sql = "SELECT * FROM customers WHERE id = '$id'";
+		//$customer = $db->query($sql);
 
-		$row = $customer->fetch_assoc();
+		//$row = $customer->fetch_assoc();
 		
-		return $row;
+		//return $row;
 	}
 	
-	function CheckForShipments($currentGame, $newAleOrder, $newWineOrder)
+	function CheckForShipments($newOrders)
 	{
+		//need to add bulk_orders to games table
+		global $currentGame;
+		
 		if ($newAleOrder > 0)
 		{
 			while($currentGame["current_money"] >= GetItemCostByName("bulk_ale") && $newAleOrder > 0)
@@ -227,39 +219,160 @@
 			}
 			
 		}
-		return $currentGame;
 	}
 	
 	function GetItemCostByName($name)
 	{
 		$db = Database::getInstance();
 		
-		$sql = "SELECT cost FROM items WHERE name = '$name'";
+		$sql = "SELECT unit_cost FROM items WHERE unit_name = '$name'";
 		$result = $db->query($sql);
 
 		$row = $result->fetch_assoc();
 		
-		return $row["cost"];
+		return $row["unit_cost"];
 	}
 	
-	function EndDay($currentGame)
+	function RecordDay()
 	{
+		global $currentGame;
 		
-		$currentGame["tavern_date"]++; 
-	
-		EndTurn($currentGame);
+		$db = Database::getInstance();
+		
+		$currentGame["tavern_date"]++;
+		
+		foreach($currentGame as $key => $value)
+		{
+			$keys[] = $key;
+			$values[] = $value;
+		}
+		$keysImploded = implode(", ", $keys);
+		$valuesImploded = implode(" , ", $values);
+		
+		$sql = "INSERT INTO games (" . $keysImploded . ") VALUES (" . $valuesImploded . ")";
+    
+		$db->query($sql);
+		
+		$sql = "INSERT INTO test VALUES ('" . $sql ."')";
+		$db->query($sql);
 	}
 
 
 	
-	function GetItemQtyByName($name)
+	function RecordLedger($userId, $tavernDate, $record)
+	{
+		$db = Database::getInstance();
+
+		$sql = "INSERT INTO ledgers VALUES ('$userId', '$tavernDate', '$record')";
+		$db->query($sql);
+	}
+	
+	function GetCurrentGame($userId)
 	{
 		$db = Database::getInstance();
 		
-		$sql = "SELECT qty FROM items WHERE name = '$name'";
+		$sql = "SELECT * FROM games WHERE user_id = '$userId' ORDER BY tavern_date DESC";
 		$result = $db->query($sql);
 
 		$row = $result->fetch_assoc();
 		
-		return $row["qty"];
+		if (!empty($row))
+		{
+			return $row;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	function NewGame($userId)
+	{
+	    $db = Database::getInstance();
+
+		$sql = "INSERT INTO games (user_id) VALUES ('$userId')";
+		$db->query($sql);
+		
+		return $userId;
+	}
+	
+	function GetGameByDate($userId, $date)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM games WHERE (user_id = '$userId') AND (tavern_date = '$date')";
+		$result = $db->query($sql);
+
+		if(!empty($result))
+		{
+			$row = $result->fetch_assoc();
+		
+			return $row;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	function GetUsername($userId)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT username FROM users WHERE id = '$userId'";
+		$result = $db->query($sql);
+
+		$row = $result->fetch_assoc();
+		
+		return $row['username'];
+	}
+		
+	function FormatDate($days)
+	{
+		$numberOfYears = (int)($days / 360)+1;
+		$numberOfMonths = (int)(($days % 360) / 30)+1;
+		$numberOfDays = (int)(($days % 360) % 30)+1;
+		
+		return "Year: " . $numberOfYears . " Month: " . $numberOfMonths . " Day: " . (int)$numberOfDays;
+	}
+	
+	
+	function GetItems()
+	{
+		$db = Database::getInstance();
+
+		$sql = "SELECT * FROM items";
+		$items = $db->query($sql);
+
+		return $items;
+	}
+	
+	function GetDaysLedger($userId, $tavernDate)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT record FROM ledgers WHERE (user_id = '$userId') AND (tavern_date = '$tavern_date')";
+		$ledger = $db->query($sql);
+
+		return $ledger;
+		
+	}
+	
+	function OpenCases()
+	{
+		global $currentGame;
+		
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM items";
+		$items = $db->query($sql);
+		
+		foreach($items as $item)
+		{
+			if($currentGame[$item['unit_name']] == 0 && $currentGame[$item['bulk_name']] > 0)
+			{
+				$currentGame[$item['unit_name']]--;
+				$currentGame[$itme["unit_name"]] += $item['bulk_qty'];
+			}			
+		}
 	}

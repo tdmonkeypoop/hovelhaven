@@ -1,5 +1,4 @@
 <?php
-	require_once ("Scripts/sql.php");
 
 	session_start();
 	

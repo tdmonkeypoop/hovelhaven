@@ -1,7 +1,6 @@
 <?php
 	session_start();
-	require_once("Scripts/database.php");
-	require_once("Scripts/sql.php");
+	require_once("Scripts/end-turn.php");
 	
 	if (empty($_SESSION["userId"]))
 	{
@@ -15,77 +14,6 @@
 	
 	$currentGame = GetCurrentGame($_SESSION["userId"]);
 	$yesterdayGame = GetGameByDate($_SESSION["userId"], $currentGame["tavern_date"] - 1);
-	
-	function NewGame($userId)
-	{
-	    $db = Database::getInstance();
-
-		$sql = "INSERT INTO games (user_id) VALUES ('$userId')";
-		$db->query($sql);
-		
-		return $userId;
-	}
-	
-	function GetGameByDate($userId, $date)
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT * FROM games WHERE (user_id = '$userId') AND (tavern_date = '$date')";
-		$result = $db->query($sql);
-
-		if(!empty($result))
-		{
-			$row = $result->fetch_assoc();
-		
-			return $row;
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	function GetUsername($userId)
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT username FROM users WHERE id = '$userId'";
-		$result = $db->query($sql);
-
-		$row = $result->fetch_assoc();
-		
-		return $row['username'];
-	}
-		
-	function FormatDate($days)
-	{
-		$numberOfYears = (int)($days / 360)+1;
-		$numberOfMonths = (int)(($days % 360) / 30)+1;
-		$numberOfDays = (int)(($days % 360) % 30)+1;
-		
-		return "Year: " . $numberOfYears . " Month: " . $numberOfMonths . " Day: " . (int)$numberOfDays;
-	}
-	
-	function GetItems()
-	{
-		$db = Database::getInstance();
-
-		$sql = "SELECT * FROM items";
-		$items = $db->query($sql);
-
-		return $items;
-	}
-	
-	function GetDaysLedger($userId, $tavernDate)
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT record FROM ledgers WHERE (user_id = '$userId') AND (tavern_date = '$tavern_date')";
-		$result = $db->query($sql);
-
-		return $result;
-		
-	}
 ?>
 
 <html>
