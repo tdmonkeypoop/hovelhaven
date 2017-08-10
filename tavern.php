@@ -1,23 +1,91 @@
 <?php
 	session_start();
+	require_once("Scripts/database.php");
 	require_once("Scripts/sql.php");
 	
-	if (!empty($_SESSION["userId"]))
-	{
-		$_SESSION["gameId"] = GetUserGameId($_SESSION["userId"]);
-	}
-	else
+	if (empty($_SESSION["userId"]))
 	{
 		header("location: index.php");
 	}
 	
-	if (empty($_SESSION["gameId"]))
+	if (empty(GetCurrentGame($_SESSION["userId"])))
 	{
-		$_SESSION["gameId"] = NewGame($_SESSION["userId"]);
+		NewGame($_SESSION["userId"]);
 	}
 	
-	$currentGame = GetCurrentGame($_SESSION["gameId"]);
-	$yesterdayGame = GetGameByDate($_SESSION["gameId"], $currentGame["currentdate"] - 1);
+	$currentGame = GetCurrentGame($_SESSION["userId"]);
+	$yesterdayGame = GetGameByDate($_SESSION["userId"], $currentGame["tavern_date"] - 1);
+	
+	function NewGame($userId)
+	{
+	    $db = Database::getInstance();
+
+		$sql = "INSERT INTO games (user_id) VALUES ('$userId')";
+		$db->query($sql);
+		
+		return $userId;
+	}
+	
+	function GetGameByDate($userId, $date)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM games WHERE (user_id = '$userId') AND (tavern_date = '$date')";
+		$result = $db->query($sql);
+
+		if(!empty($result))
+		{
+			$row = $result->fetch_assoc();
+		
+			return $row;
+		}
+		else
+		{
+			return null;
+		}
+	}
+	
+	function GetUsername($userId)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT username FROM users WHERE id = '$userId'";
+		$result = $db->query($sql);
+
+		$row = $result->fetch_assoc();
+		
+		return $row['username'];
+	}
+		
+	function FormatDate($days)
+	{
+		$numberOfYears = (int)($days / 360)+1;
+		$numberOfMonths = (int)(($days % 360) / 30)+1;
+		$numberOfDays = (int)(($days % 360) % 30)+1;
+		
+		return "Year: " . $numberOfYears . " Month: " . $numberOfMonths . " Day: " . (int)$numberOfDays;
+	}
+	
+	function GetItems()
+	{
+		$db = Database::getInstance();
+
+		$sql = "SELECT * FROM items";
+		$items = $db->query($sql);
+
+		return $items;
+	}
+	
+	function GetDaysLedger($userId, $tavernDate)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT record FROM ledgers WHERE (user_id = '$userId') AND (tavern_date = '$tavern_date')";
+		$result = $db->query($sql);
+
+		return $result;
+		
+	}
 ?>
 
 <html>
@@ -39,12 +107,11 @@
 	    <!--Content-->
 	    <div class="logo middled centered"><img src="/Images/logo.jpg" alt="Logo" width="100%" height="100%"></div>
 	    <div class="header middled centered">
-	    	<h1><?=GetUsername($currentGame["userid"])?>'s Tavern</h1>
+	    	<h1><?=GetUsername($currentGame["user_id"])?>'s Tavern</h1>
     	</div>
 	    <div class="summary">
 	        <div class="summary-item justify-right">Coming Soon</div>
 	        <div class="summary-item justify-right">User Id: <?php echo $_SESSION["userId"]; ?></div>
-	        <div class="summary-item justify-right">Game Id: <?php echo $_SESSION["gameId"]; ?></div>
 	        <div class="summary-item justify-right"></div>
 	        <div class="summary-item justify-right"></div>
 	    </div>
@@ -82,47 +149,43 @@
     		<div class="ledger-card-title card-title middled centered">LEDGER</div>
 	    	<!--Cards-->
 	    	<div class="summary-card card">
-	    		Current Day:<br><?=FormatDate($currentGame["currentdate"])?><br><br>
-	    		Total Cash: $<?=$currentGame["currentmoney"]?><br><br>
+	    		Current Day:<br><?=FormatDate($currentGame["tavern_date"])?><br><br>
+	    		Total Cash: $<?=$currentGame["current_money"]?><br><br>
 	    		&lt;-- Yesterday --><br>
-	    		Total Earned: $<?= $currentGame["currentmoney"] - $yesterdayGame["currentmoney"]?><br>
-	    		Ale sold: <?= $yesterdayGame["mug_ale"] - $currentGame["mug_ale"] ?><br>
-	    		Wine sold: <?= $yesterdayGame["glass_wine"] - $currentGame["glass_wine"] ?><br>
+	    		Total Earned: $<?= $currentGame["current_money"] - $yesterdayGame["current_money"]?><br>
+	    		Ale sold: <?= $yesterdayGame["unit_ale"] - $currentGame["unit_ale"] ?><br>
+	    		Wine sold: <?= $yesterdayGame["unit_wine"] - $currentGame["unit_wine"] ?><br>
 	    	</div>
 	    	<div class="prices-card card">
-			<label>Mug of Ale: $<?= $currentGame["mug_ale_price"]?> New:$</label><input type="text" style="width:40px; float:right" value="<?= $currentGame["mug_ale_price"]?>" name="aleprice"><br><br>
-			<label>Glass of Wine: $<?= $currentGame["glass_wine_price"]?> New:$</label><input type="text" style="width:40px; float:right" value="<?= $currentGame["glass_wine_price"]?>" name="wineprice"><br><br>
-			<label>Common Meal: $<?= $currentGame["common_meal_price"]?> New:$</label><input type="text" style="width:40px; float:right" value="<?= $currentGame["common_meal_price"]?>" name="commonmealprice"><br><br>
-			<label>Fine Meal: $<?= $currentGame["fine_meal_price"]?> New:$</label><input type="text" style="width:40px; float:right" value="<?= $currentGame["fine_meal_price"]?>" name="finemealprice"><br><br>
+			<label>Mug of Ale: <?= $currentGame["unit_ale_price"]?>cp New:</label><input type="text" style="width:40px; float:right" value="<?= $currentGame["unit_ale_price"]?>cp" name="unitAlePrice"><br><br>
+			<label>Glass of Wine: <?= $currentGame["unit_wine_price"]?>cp New:</label><input type="text" style="width:40px; float:right" value="<?= $currentGame["unit_wine_price"]?>cp" name="unitWineprice"><br><br>
+			<label>Chicken Wings: <?= $currentGame["Chicken Wings_price"]?>cp New:</label><input type="text" style="width:40px; float:right" value="<?= $currentGame["Chicken Wings_price"]?>cp" name="chickenWingsPrice"><br><br>
 			<br><br>
 			&lt;-- ORDER --><br><br>
-			<label>Keg of Ale: $<?= GetItemCostByName("keg_ale") ?></label><input type="text" style="width:40px; float:right" placeholder="0" name="orderale"><br><br>
-			<label>Barrel of Wine: $<?= GetItemCostByName("barrel_wine") ?> </label><input type="text" style="width:40px; float:right" placeholder="0" name="orderwine"><br><br>
-			<label>Full Chicken: $<?= GetItemCostByName("full_chicken") ?></label><input type="text" style="width:40px; float:right" placeholder="0" name="orderchicken"><br><br>
-			<label>Pig: $<?= GetItemCostByName("pig") ?></label><input type="text" style="width:40px; float:right" placeholder="0" name="orderpig"><br><br>
-			<label>Bag of Carrots: $<?= GetItemCostByName("carrot_bag") ?></label><input type="text" style="width:40px; float:right" placeholder="0" name="ordercarrot"><br><br>
-			<label>Sack of Potatos: $<?= GetItemCostByName("potato_sack") ?> </label><input type="text" style="width:40px; float:right" placeholder="0" name="orderpotato"><br><br>
-	    	</div>
+			<?php
+			$items = GetItems();
+			foreach($items as $item): ?>
+			<label><?=$item['bulk_name']?>: <?= $item['bulk_cost'] ?>cp</label><input type="text" style="width:40px; float:right" placeholder="0" name="<?= $item['bulk_name'] ?>"><br><br>
+			<?php endforeach; ?>
+			</div>
 	    	<div class="expenses-card card">
-	    		Mugs of Ale: <?=$currentGame["mug_ale"]?><br>
-	    		Glasses of Wine: <?=$currentGame["glass_wine"]?><br>
-	    		Common Meals: <?=$currentGame["common_meal"]?><br>
-	    		Fine Meals: <?=$currentGame["fine_meal"]?><br>
-	    		Poultry: <?=$currentGame["chicken"]?><br>
-	    		Pork Chops: <?=$currentGame["pork_chop"]?><br>
-	    		Carrots: <?=$currentGame["carrot"]?><br>
-	    		Potatos: <?=$currentGame["potato"]?><br>
-	    		Barrels of Wine: <?=$currentGame["barrel_wine"]?><br>
-	    		Kegs of Ale: <?=$currentGame["keg_ale"]?><br>
-	    		Full Chickens: <?=$currentGame["full_chicken"]?><br>
-	    		Pigs: <?=$currentGame["pig"]?><br>
-	    		Carrot Bags: <?=$currentGame["carrot_bag"]?><br>
-	    		Potato Sacks: <?=$currentGame["potato_sack"]?><br><br>
+				Mug of Ale: <?=$currentGame["unit_ale"]?><br>
+	    		Glasses of Wine: <?=$currentGame["unit_wine"]?><br>
+	    		Poultry: <?=$currentGame["unit_poultry"]?><br>
+	    		Pork Chops: <?=$currentGame["unit_pork"]?><br>
+	    		Carrots: <?=$currentGame["unit_carrots"]?><br>
+	    		Potatos: <?=$currentGame["unit_potato"]?><br>
+	    		Kegs of Ale: <?=$currentGame["bulk_ale"]?><br>
+	    		Barrels of Wine: <?=$currentGame["bulk_wine"]?><br>
+	    		Full Chickens: <?=$currentGame["bulk_poultry"]?><br>
+	    		Pigs: <?=$currentGame["bulk_pork"]?><br>
+	    		Carrot Bags: <?=$currentGame["bulk_carrot"]?><br>
+	    		Potato Sacks: <?=$currentGame["bulk_potato"]?><br><br>
 	    	</div>
 	    	<div class="ledger-card card">
 	    		<?php
-	    		$yesterdaysDate = $currentGame["currentdate"] - 1;
-	    		$yesterdaysLedger = GetDaysLedger($currentGame["gameid"], $yesterdaysDate);
+	    		$yesterdaysDate = $currentGame["tavern_date"] - 1;
+	    		$yesterdaysLedger = GetDaysLedger($currentGame["user_id"], $yesterdaysDate);
 	    		foreach($yesterdaysLedger as $currentLedger): ?>
    					<?= $currentLedger["record"] ?><br>
    				<?php endforeach; ?>

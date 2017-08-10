@@ -1,21 +1,31 @@
 <?php
 	session_start();
 
-	require_once("sql.php");
-	require_once("database.php");
+	require("sql.php");
+	//require("database.php");
 	
 	if (empty($_SESSION["userId"]))
 	{
 		header("location: ../index.php");
 	}
 	
-	$currentGame = GetCurrentGame($_SESSION["gameId"]);
+	$currentGame = GetCurrentGame($_SESSION["userId"]);
 	
 	$inputArray = array();
-	$currentGame["mug_ale_price"]		= htmlspecialchars(stripslashes(trim($_POST["aleprice"])));
-	$currentGame["glass_wine_price"] 	= htmlspecialchars(stripslashes(trim($_POST["wineprice"])));
-	$currentGame["common_meal_price"]	= htmlspecialchars(stripslashes(trim($_POST["commonmealprice"])));
-	$currentGame["fine_meal_price"] 	= htmlspecialchars(stripslashes(trim($_POST["finemealprice"])));
+	$currentGame["unit_ale_price"]		= htmlspecialchars(stripslashes(trim($_POST["unitAlePrice"])));
+	$currentGame["unit_wine_price"] 	= htmlspecialchars(stripslashes(trim($_POST["unitWineprice"])));
+	$currentGame["Chicken Wings_price"]	= htmlspecialchars(stripslashes(trim($_POST["chickenWingsPrice"])));
+	$currentGame["Pigs in the Coop_price"]	= htmlspecialchars(stripslashes(trim($_POST["pigsInTheCoopPrice"])));
+	$currentGame["Homestyle Chicken_price"]	= htmlspecialchars(stripslashes(trim($_POST["homestyleChickenPrice"])));
+	$currentGame["Chicken Hash_price"]	= htmlspecialchars(stripslashes(trim($_POST["chickenHashPrice"])));
+	$currentGame["Chicken Pot Pie_price"]	= htmlspecialchars(stripslashes(trim($_POST["chickenPotPiePrice"])));
+	$currentGame["Pork Chops_price"]	= htmlspecialchars(stripslashes(trim($_POST["porkChopsPrice"])));
+	$currentGame["Homestyle Pork_price"]	= htmlspecialchars(stripslashes(trim($_POST["homestylePorkPrice"])));
+	$currentGame["Pork Hash_price"]	= htmlspecialchars(stripslashes(trim($_POST["porkHashPrice"])));
+	$currentGame["Stew_price"]	= htmlspecialchars(stripslashes(trim($_POST["stewPrice"])));
+	$currentGame["Carrot Broth_price"]	= htmlspecialchars(stripslashes(trim($_POST["carrotBrothPrice"])));
+	$currentGame["Steamed Veggies_price"]	= htmlspecialchars(stripslashes(trim($_POST["steamedVeggiesPrice"])));
+	$currentGame["Mashed Potatoes_price"]	= htmlspecialchars(stripslashes(trim($_POST["mashedPotatoesPrice"])));
 	$inputArray["orderale"]				= htmlspecialchars(stripslashes(trim($_POST["orderale"])));
 	$inputArray["orderwine"] 			= htmlspecialchars(stripslashes(trim($_POST["orderwine"])));
 	$inputArray["orderchicken"]			= htmlspecialchars(stripslashes(trim($_POST["orderchicken"])));
@@ -31,16 +41,16 @@
 
 	function OpenCases($currentGame)
 	{
-		if($currentGame["mug_ale"] == 0 && $currentGame["keg_ale"] > 0)
+		if($currentGame["unit_ale"] == 0 && $currentGame["bulk_ale"] > 0)
 		{
-			$currentGame["keg_ale"]--;
-			$currentGame["mug_ale"] = GetItemQtyByName("keg_ale");
+			$currentGame["bulk_ale"]--;
+			$currentGame["unit_ale"] = GetItemQtyByName("bulk_ale");
 		}
 		
-		if($currentGame["glass_wine"] == 0 && $currentGame["barrel_wine"] > 0)
+		if($currentGame["unit_wine"] == 0 && $currentGame["bulk_wine"] > 0)
 		{
-			$currentGame["barrel_wine"]--;
-			$currentGame["glass_wine"] = GetItemQtyByName("barrel_wine");
+			$currentGame["bulk_wine"]--;
+			$currentGame["unit_wine"] = GetItemQtyByName("bulk_wine");
 		}
 		
 		return $currentGame;
@@ -49,8 +59,8 @@
 	function PickDaysCustomers($currentGame)
 	{
 		$numberOfCustomers	= CalculateNumberOfCustomers();
-		$aleProfitPercent	= ($currentGame["mug_ale_price"] / GetItemCostByName("mug_ale")) - 1.25;
-		$wineProfitPercent	= ($currentGame["glass_wine_price"] / GetItemCostByName("glass_wine")) - 1.25;
+		$aleProfitPercent	= ($currentGame["unit_ale_price"] / GetItemCostByName("unit_ale")) - 1.25;
+		$wineProfitPercent	= ($currentGame["unit_wine_price"] / GetItemCostByName("unit_wine")) - 1.25;
 		
 		for ($i = 0; $i < $numberOfCustomers; $i++)
 		{
@@ -72,7 +82,7 @@
 				
 				if ($drinkChoice <= $customer["ale_pref"])
 				{
-					if ($currentGame["mug_ale"] > 0)
+					if ($currentGame["unit_ale"] > 0)
 					{
 						$stingyFactor = $aleProfitPercent * $customer['stinginess'];
 						
@@ -85,26 +95,26 @@
 						{
 							$customerTotalAle++;
 							$currentGame = GiveCustomerAle($currentGame);	
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customerResponse . "ale ". $currentGame['mug_ale'] . " remain.");
+							RecordLedger($currentGame["user_id"], $currentGame["tavern_date"], $customerResponse . "ale ". $currentGame['unit_ale'] . " remain.");
 						}
 						else if ($customer['happiness'] < -5 && $customerTotalWine == 0 && $customerTotalAle == 0)
 						{
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customerResponse . "left angry (ale price)");
+							RecordLedger($currentGame["user_id"], $currentGame["tavern_date"], $customerResponse . "left angry (ale price)");
 						}
 						else
 						{
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $customerResponse . "left happy");
+							RecordLedger($currentGame["user_id"], $currentGame["tavern_date"],  $customerResponse . "left happy");
 						}
 					}
 					else 
 					{
 						$customer['happiness'] -= 3;
-						RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $customerResponse . "angry for ale");
+						RecordLedger($currentGame["user_id"], $currentGame["tavern_date"],  $customerResponse . "angry for ale");
 					}
 				}
 				else
 				{
-					if ($currentGame["glass_wine"] > 0)
+					if ($currentGame["unit_wine"] > 0)
 					{
 						$stingyFactor = $wineProfitPercent * $customer['stinginess'];
 						
@@ -117,21 +127,21 @@
 						{
 							$customerTotalWine++;
 							$currentGame = GiveCustomerWine($currentGame);	
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customerResponse . "wine " . $currentGame['glass_wine'] . " remain");
+							RecordLedger($currentGame["unit_id"], $currentGame["tavern_date"], $customerResponse . "wine " . $currentGame['unit_wine'] . " remain");
 						}
 						else if ($customer['happiness'] < -5 && $customerTotalWine == 0 && $customerTotalAle == 0)
 						{
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"], $customerResponse . "left angry (wine price)");
+							RecordLedger($currentGame["unit_id"], $currentGame["tavern_date"], $customerResponse . "left angry (wine price)");
 						}
 						else
 						{
-							RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $customerResponse . "left happy");
+							RecordLedger($currentGame["unit_id"], $currentGame["tavern_date"],  $customerResponse . "left happy");
 						}
 					}
 					else 
 					{
 						$customer['happiness'] -= 3;
-						RecordLedger($currentGame["gameid"], $currentGame["currentdate"],  $customerResponse . "angry for wine");
+						RecordLedger($currentGame["unit_id"], $currentGame["tavern_date"],  $customerResponse . "angry for wine");
 					}
 				}
 			}
@@ -142,16 +152,16 @@
 	
 	function GiveCustomerAle($currentGame)
 	{
-		$currentGame['mug_ale']--;
-		$currentGame['currentmoney'] += $currentGame['mug_ale_price'];
+		$currentGame['unit_ale']--;
+		$currentGame['current_money'] += $currentGame['unit_ale_price'];
 		
 		return $currentGame;
 	}
 	
 	function GiveCustomerWine($currentGame)
 	{
-		$currentGame['glass_wine']--;
-		$currentGame['currentmoney'] += $currentGame['glass_wine_price'];
+		$currentGame['unit_wine']--;
+		$currentGame['current_money'] += $currentGame['glass_wine_price'];
 		
 		return $currentGame;
 	}
@@ -198,10 +208,10 @@
 	{
 		if ($newAleOrder > 0)
 		{
-			while($currentGame["currentmoney"] >= GetItemCostByName("keg_ale") && $newAleOrder > 0)
+			while($currentGame["current_money"] >= GetItemCostByName("bulk_ale") && $newAleOrder > 0)
 			{
-				$currentGame["currentmoney"] -= GetItemCostByName("keg_ale");
-				$currentGame["keg_ale"]++;
+				$currentGame["current_money"] -= GetItemCostByName("bulk_ale");
+				$currentGame["bulk_ale"]++;
 				$newAleOrder--;
 			}
 			
@@ -209,10 +219,10 @@
 		
 		if ($newWineOrder > 0)
 		{
-			while($currentGame["currentmoney"] >= GetItemCostByName("barrel_wine") && $newWineOrder > 0)
+			while($currentGame["current_money"] >= GetItemCostByName("bulk_wine") && $newWineOrder > 0)
 			{
-				$currentGame["currentmoney"] -= GetItemCostByName("barrel_wine");
-				$currentGame["barrel_wine"]++;
+				$currentGame["current_money"] -= GetItemCostByName("bulk_wine");
+				$currentGame["bulk_wine"]++;
 				$newWineOrder--;
 			}
 			
@@ -220,10 +230,22 @@
 		return $currentGame;
 	}
 	
+	function GetItemCostByName($name)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT cost FROM items WHERE name = '$name'";
+		$result = $db->query($sql);
+
+		$row = $result->fetch_assoc();
+		
+		return $row["cost"];
+	}
+	
 	function EndDay($currentGame)
 	{
 		
-		$currentGame["currentdate"]++; 
+		$currentGame["tavern_date"]++; 
 	
 		EndTurn($currentGame);
 	}

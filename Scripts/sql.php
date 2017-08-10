@@ -1,71 +1,6 @@
 <?php
 	require ("database.php");
-	
-	function GetUserGameId($userId)
-	{
-	    $db = Database::getInstance();
-		$sql = "SELECT gameid FROM users where id = '$userId'";
-		$result = $db->query($sql);
 
-		if ($result ->num_rows > 0)
-		{
-			$row = $result->fetch_assoc();
-			return $row["gameid"];
-		}
-		
-		return null;
-	}
-	
-	function NewGame($userId)
-	{
-	    $db = Database::getInstance();
-
-		$sql = "INSERT INTO games (gameid, userid, currentdate, currentmoney, mug_ale, glass_wine, common_meal, fine_meal, chicken, pork_chop, carrot, potato, barrel_wine, keg_ale, full_chicken, pig, carrot_bag, potato_sack, mug_ale_price, glass_wine_price, common_meal_price, fine_meal_price) values ('$userId', '$userId', 0, 100.00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 2)";
-		$db->query($sql);
-		
-		$sql = "SELECT gameid FROM games where userid = '$userId'";
-		$result = $db->query($sql);
-
-		$row = $result->fetch_assoc();
-		$gameId = $row["gameid"];
-		
-		$sql = "UPDATE users SET gameid = '$gameId' WHERE id='$userId'";
-		$result = $db->query($sql);
-		
-		return $gameId;
-	}
-	
-	function GetCurrentGame($gameId)
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT * FROM games WHERE gameid = '$gameId' ORDER BY currentdate DESC";
-		$result = $db->query($sql);
-
-		$row = $result->fetch_assoc();
-		
-		return $row;
-	}
-	
-	function GetGameByDate($gameId, $date)
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT * FROM games WHERE (gameid = '$gameId') AND (currentdate = '$date')";
-		$result = $db->query($sql);
-
-		if(!empty($result))
-		{
-			$row = $result->fetch_assoc();
-		
-			return $row;
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
 	function EndTurn($currentGame)
 	{
 		$db = Database::getInstance();
@@ -85,15 +20,6 @@
 		$sql = "INSERT INTO test VALUES ('" . $sql ."')";
 		$db->query($sql);
 	}
-	
-	function FormatDate($days)
-	{
-		$numberOfYears = (int)($days / 360)+1;
-		$numberOfMonths = (int)(($days % 360) / 30)+1;
-		$numberOfDays = (int)(($days % 360) % 30)+1;
-		
-		return "Year: " . $numberOfYears . " Month: " . $numberOfMonths . " Day: " . (int)$numberOfDays;
-	}
 
 	function RecordLedger($gameId, $gameDate, $record)
 	{
@@ -103,31 +29,22 @@
 		$db->query($sql);
 	}
 	
-	function GetDaysLedger($gameId, $gameDate)
+	function GetCurrentGame($userId)
 	{
 		$db = Database::getInstance();
 		
-		$sql = "SELECT record FROM ledgers WHERE (gameid = '$gameId') AND (date = '$gameDate')";
-		$result = $db->query($sql);
-
-		return $result;
-		
-	}
-	
-	function GetItemCostByName($name)
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT cost FROM items WHERE name = '$name'";
+		$sql = "SELECT * FROM games WHERE user_id = '$userId' ORDER BY tavern_date DESC";
 		$result = $db->query($sql);
 
 		$row = $result->fetch_assoc();
 		
-		return $row["cost"];
+		if (!empty($row))
+		{
+			return $row;
+		}
+		else
+		{
+			return null;
+		}
 	}
-	
-	
-	
-	
-	
 	

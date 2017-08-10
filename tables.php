@@ -30,45 +30,44 @@
     /*************************************
      * games
      *************************************/
-    $sql = 'CREATE TABLE games (gameid INT, userid INT, currentdate INT, currentmoney INT, unit_ale INT, bulk_ale INT, unit_wine INT, bulk_wine INT, unit_poultry INT, bulk_poultry INT, unit_pork INT, bulk_pork INT, unit_carrot INT, bulk_carrot INT, unit_potato INT, bulk_potato INT, unit_ale_price INT, unit_wine_price INT, `Chicken Wings_price` INT, `Pigs in the Coop_price` INT, `Homestyle Chicken_price` INT, `Chicken Hash_price` INT, `Chicken Pot Pie_price` INT, `Pork Chops_price` INT, `Homestyle Pork_price` INT, `Pork Hash_price` INT, Stew_price INT, `Carrot Broth_price` INT, `Steamed Veggies_price` INT, `Mashed Potatoes_price` INT)';
+    $sql = "CREATE TABLE games (user_id INT, tavern_date INT DEFAULT 0, current_money INT DEFAULT 250, unit_ale INT DEFAULT 0, bulk_ale INT DEFAULT 0, unit_wine INT DEFAULT 0, bulk_wine INT DEFAULT 0, unit_poultry INT DEFAULT 0, bulk_poultry INT DEFAULT 0, unit_pork INT DEFAULT 0, bulk_pork INT DEFAULT 0, unit_carrot INT DEFAULT 0, bulk_carrot INT DEFAULT 0, unit_potato INT DEFAULT 0, bulk_potato INT DEFAULT 0, unit_ale_price INT DEFAULT 4, unit_wine_price INT DEFAULT 8, `Chicken Wings_price` INT DEFAULT 6, `Pigs in the Coop_price` INT DEFAULT 14, `Homestyle Chicken_price` INT DEFAULT 7, `Chicken Hash_price` INT DEFAULT 7, `Chicken Pot Pie_price` INT DEFAULT 8, `Pork Chops_price` INT DEFAULT 6, `Homestyle Pork_price` INT DEFAULT 9, `Pork Hash_price` INT DEFAULT 9, `Stew_price` INT DEFAULT 10, `Carrot Broth_price` INT DEFAULT 1, `Steamed Veggies_price` INT DEFAULT 2, `Mashed Potatoes_price` INT DEFAULT 1)";
     $db->query($sql);
     /*
-        gameid                      INT
-        userid                      INT
-        currentdate                 INT
-        currentmoney                INT
-        unit_ale                    INT
-        bulk_ale                    INT
-        unit_wine                   INT
-        bulk_wine                   INT
-        unit_poultry                INT
-        bulk_poultry                INT
-        unit_pork                   INT
-        bulk_pork                   INT
-        unit_carrot                 INT
-        bulk_carrot                 INT
-        unit_potato                 INT
-        bulk_potato                 INT
-        unit_ale_price              INT
-        unit_wine_price             INT
-        Chicken Wings_price         INT
-        Pigs in the Coop_price      INT
-        Homestyle Chicken_price     INT
-        Chicken Hash_price          INT
-        Chicken Pot Pie_price       INT
-        Pork Chops_price            INT
-        Homestyle Pork_price        INT
-        Pork Hash_price             INT
-        Stew_price                  INT
-        Carrot Broth_price          INT
-        Steamed Veggies_price       INT
-        Mashed Potatoes_price       INT
+        user_id                     INT
+        tavern_date                 INT DEFAULT 0
+        current_money               INT DEFAULT 250
+        unit_ale                    INT DEFAULT 0
+        bulk_ale                    INT DEFAULT 0
+        unit_wine                   INT DEFAULT 0
+        bulk_wine                   INT DEFAULT 0
+        unit_poultry                INT DEFAULT 0
+        bulk_poultry                INT DEFAULT 0
+        unit_pork                   INT DEFAULT 0
+        bulk_pork                   INT DEFAULT 0
+        unit_carrot                 INT DEFAULT 0
+        bulk_carrot                 INT DEFAULT 0
+        unit_potato                 INT DEFAULT 0
+        bulk_potato                 INT DEFAULT 0
+        unit_ale_price              INT DEFAULT 4
+        unit_wine_price             INT DEFAULT 8
+        Chicken Wings_price         INT DEFAULT 6
+        Pigs in the Coop_price      INT DEFAULT 14
+        Homestyle Chicken_price     INT DEFAULT 7
+        Chicken Hash_price          INT DEFAULT 7
+        Chicken Pot Pie_price       INT DEFAULT 8
+        Pork Chops_price            INT DEFAULT 6
+        Homestyle Pork_price        INT DEFAULT 9
+        Pork Hash_price             INT DEFAULT 9
+        Stew_price                  INT DEFAULT 10
+        Carrot Broth_price          INT DEFAULT 1
+        Steamed Veggies_price       INT DEFAULT 2
+        Mashed Potatoes_price       INT DEFAULT 1
     */
 
     /*************************************
      * citizens
      *************************************/
-    $sql = "CREATE TABLE citizens (gameid INT, first_name TEXT, last_name TEXT, drink_type_id INT, food_type_id INT, profession_id INT, happiness INT, stinginess INT, active BOOL)";
+    $sql = 'CREATE TABLE citizens (gameid INT, first_name TEXT, last_name TEXT, drink_type_id INT, food_type_id INT, profession_id INT, happiness INT, stinginess INT, active BOOL)';
     $db->query($sql);
     /*
         gameid          INT
@@ -86,12 +85,12 @@
     /*************************************
      * ledgers
      *************************************/
-    $sql = "CREATE TABLE ledgers (gameid INT, date INT NOT NULL, record TEXT)";
+    $sql = "CREATE TABLE ledgers (user_id INT, tavern_date INT NOT NULL, record TEXT)";
     $db->query($sql);
     /*
-        gameid
-        date
-        record
+        user_id     INT
+        tavern_date INT
+        record      INT
     */
     
     /*************************************
