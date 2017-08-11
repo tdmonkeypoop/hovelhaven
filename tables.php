@@ -63,24 +63,6 @@
         Steamed Veggies_price       INT DEFAULT 2
         Mashed Potatoes_price       INT DEFAULT 1
     */
-
-    /*************************************
-     * citizens
-     *************************************/
-    $sql = 'CREATE TABLE citizens (gameid INT, first_name TEXT, last_name TEXT, drink_type_id INT, food_type_id INT, profession_id INT, happiness INT, stinginess INT, active BOOL)';
-    $db->query($sql);
-    /*
-        gameid          INT
-        first_name      TEXT
-        last_name       TEXT
-        drink_type_id   INT
-        food_type_id    INT
-        profession_id   INT
-        happiness       INT
-        stinginess      INT
-        active          BOOL
-    */
-    
     
     /*************************************
      * ledgers
@@ -96,24 +78,26 @@
     /*************************************
      * items
      *************************************/
-    $sql = "CREATE TABLE items (id INT PRIMARY KEY AUTO_INCREMENT, unit_name TEXT, unit_cost INT, bulk_name TEXT, bulk_cost INT, bulk_qty INT)";
+    $sql = "CREATE TABLE items (id INT PRIMARY KEY AUTO_INCREMENT, unit_name TEXT, unit_tag TEXT, unit_cost INT, bulk_name TEXT, bulk_tag TEXT, bulk_cost INT, bulk_qty INT)";
     $db->query($sql);
     /*
         id          INT PKEY
         unit_name   TEXT
+        unit_tag   TEXT
         unit_cost   INT
         bulk_name   TEXT
+        bulk_tag   TEXT
         bulk_cost   INT
         bulk_qty    INT
     */
     
     $items = array();
-    $items[] = [1,  '"unit_ale"',     4,  '"bulk_ale"',      116,    29];
-    $items[] = [2,  '"unit_wine"',    8,  '"bulk_wine"',     48,     48];
-    $items[] = [3,  '"unit_poultry"', 6,  '"bulk_poultry"',  24,     24];
-    $items[] = [4,  '"unit_pork"',    8,  '"bulk_pork"',     176,    22];
-    $items[] = [5,  '"unit_carrot"',  1,  '"bulk_carrot"',   10,     10];
-    $items[] = [6,  '"unit_potato"',  1,  '"bulk_potato"',   8,      8];
+    $items[] = [1, "'Mug of Ale'",   "'unit_ale'",    4, "'Keg of Ale'",  "'bulk_ale'",      116,    29];
+    $items[] = [2, "'Glass of Wine'",  "'unit_wine'",    8, "'Bottle of Wine'",  "'bulk_wine'",     48,     48];
+    $items[] = [3, "'Poultry'",  "'unit_poultry'", 6, "'Hen'",  "'bulk_poultry'",  24,     24];
+    $items[] = [4, "'Pork'",  "'unit_pork'",    8, "'Pig'",  "'bulk_pork'",     176,    22];
+    $items[] = [5, "'Carrot'",  "'unit_carrot'",  1, "'Bag of Carrots'",  "'bulk_carrot'",   10,     10];
+    $items[] = [6, "'Potato'",  "'unit_potato'",  1, "'Sack of Potatoes'",  "'bulk_potato'",   8,      8];
     
     $itemsImploded = array();
     for($i = 0; $i < count($items); $i++)
@@ -127,16 +111,16 @@
     /*************************************
      * recipes
      *************************************/
-    $sql = "CREATE TABLE recipes (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, Poultry_qty INT, Pork_qty INT, Carrot_qty INT, Potato_qty INT)";
+    $sql = "CREATE TABLE recipes (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, poultry_qty INT, pork_qty INT, carrot_qty INT, potato_qty INT)";
     $db->query($sql);
      
     /*
         id              INT PKEY
         name            TEXT
-        Poultry_qty     INT
-        Pork_qty        INT
-        Carrot_qty      INT
-        Potato_qty      INT
+        poultry_qty     INT
+        pork_qty        INT
+        carrot_qty      INT
+        potato_qty      INT
     */
     
     $recipes[] = [1,  "'Chicken Wings'",     1, 0, 0, 0];
@@ -161,10 +145,28 @@
     $sql = "INSERT INTO recipes VALUES" . implode(',',$recipesImploded);
     $db->query($sql);
      
-    /*************************************
-     * foodtypes
+     /*************************************
+     * customers
      *************************************/
-    $sql = "CREATE TABLE foodtypes (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, chicken_pref INT, pork_chop_pref INT, carrot_pref INT, potato_pref INT)";
+    $sql = 'CREATE TABLE customers (customer_id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, first_name TEXT, last_name TEXT, drinker_type_id INT, eater_type_id INT, profession_id INT, happiness INT, stinginess INT, active BOOL)';
+    $db->query($sql);
+    /*
+        customer_id     INT PRIMARY KEY AUTO_INCREMENT
+        user_id         INT
+        first_name      TEXT
+        last_name       TEXT
+        drinker_type_id   INT
+        eater_type_id    INT
+        profession_id   INT
+        happiness       INT
+        stinginess      INT
+        active          BOOL
+    */
+    
+    /*************************************
+     * eatertypes
+     *************************************/
+    $sql = "CREATE TABLE eatertypes (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, chicken_pref INT, pork_chop_pref INT, carrot_pref INT, potato_pref INT)";
     $db->query($sql);
     /*
         id              INT PKEY
@@ -175,26 +177,26 @@
         potato_pref     INT
     */
     
-    $foodTypes = array();
-    $foodTypes[] = [1, '"Vegetarian"',      0, 0, 1, 1];
-    $foodTypes[] = [2, '"Meat Lover"',      1, 1, 0, 0];
-    $foodTypes[] = [3, '"Muslim"',          1, 0, 1, 1];
-    $foodTypes[] = [4, '"Porker"',          0, 1, 0, 1];
-    $foodTypes[] = [5, '"Rabbit"',          0, 0, 1, 0];
+    $eaterTypes = array();
+    $eaterTypes[] = [1, '"Vegetarian"',      0, 0, 1, 1];
+    $eaterTypes[] = [2, '"Meat Lover"',      1, 1, 0, 0];
+    $eaterTypes[] = [3, '"Muslim"',          1, 0, 1, 1];
+    $eaterTypes[] = [4, '"Porker"',          0, 1, 0, 1];
+    $eaterTypes[] = [5, '"Rabbit"',          0, 0, 1, 0];
     
-    $foodTypesImploded = array();
-    for($i = 0; $i < count($foodTypes); $i++)
+    $eaterTypesImploded = array();
+    for($i = 0; $i < count($eaterTypes); $i++)
     {
-        $foodTypesImploded[] = "(" . implode(',', $foodTypes[$i]) . ")";
+        $eaterTypesImploded[] = "(" . implode(',', $eaterTypes[$i]) . ")";
     }
     
-    $sql = "INSERT INTO foodtypes VALUES" . implode(',',$foodTypesImploded);
+    $sql = "INSERT INTO eatertypes VALUES" . implode(',',$eaterTypesImploded);
     $db->query($sql);
     
     /*************************************
-     * drinktypes
+     * drinkertypes
      *************************************/
-    $sql = "CREATE TABLE drinktypes (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, ale_pref INT, wine_pref INT)";
+    $sql = "CREATE TABLE drinkertypes (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, ale_pref INT, wine_pref INT)";
     $db->query($sql);
     /*
         id              INT PKEY
@@ -203,18 +205,18 @@
         wine_pref       INT
     */
 
-    $drinkTypes = array();
-    $drinkTypes[] = [1, '"Drunk"',          5, 1];
-    $drinkTypes[] = [2, '"Oenophiliac"',    1, 5];
-    $drinkTypes[] = [3, '"Standard"',       1, 1];
+    $drinkerTypes = array();
+    $drinkerTypes[] = [1, '"Drunk"',          5, 1];
+    $drinkerTypes[] = [2, '"Oenophiliac"',    1, 5];
+    $drinkerTypes[] = [3, '"Standard"',       1, 1];
     
-    $drinkTypesImploded = array();
-    for($i = 0; $i < count($drinkTypes); $i++)
+    $drinkerTypesImploded = array();
+    for($i = 0; $i < count($drinkerTypes); $i++)
     {
-        $drinkTypesImploded[] = "(" . implode(',', $drinkTypes[$i]) . ")";
+        $drinkerTypesImploded[] = "(" . implode(',', $drinkerTypes[$i]) . ")";
     }
     
-    $sql = "INSERT INTO drinktypes VALUES" . implode(',',$drinkTypesImploded);
+    $sql = "INSERT INTO drinkertypes VALUES" . implode(',',$drinkerTypesImploded);
     $db->query($sql);
     
     /*************************************

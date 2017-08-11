@@ -8,10 +8,11 @@
 		header("location: ../index.php");
 	}
 	
+	$currentGame = GetCurrentGame($_SESSION["userId"]);
 	
 	if ($_SERVER['REQUEST_METHOD'] === 'POST')
 	{
-		$currentGame = GetCurrentGame($_SESSION["userId"]);
+		
 		
 		$inputArray = array();
 		$currentGame["unit_ale_price"]			= htmlspecialchars(stripslashes(trim($_POST["unitAlePrice"])));
@@ -35,14 +36,177 @@
 		$inputArray["ordercarrot"]				= htmlspecialchars(stripslashes(trim($_POST["ordercarrot"])));
 		$inputArray["orderpotato"]				= htmlspecialchars(stripslashes(trim($_POST["orderpotato"])));
 		
-		//GetReturningCustomers
-		//GetNewCustomers
-		//RunDaysTotals
+		$customers = array();
+		
+		GetReturningCustomers();
+		GetNewCustomers();
+		ServeCustomers();
 		//ReceiveOrders(if Monday)
 		//RecordCustomers
 		RecordDay();
 		
 		header("location: ../tavern.php");
+	}
+	
+	function GetReturningCustomers()
+	{
+		global $customers;
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM customers";
+		$returningCustomers = $db->query($sql);
+
+		if (!empty($returningCustomers))
+		{
+			foreach($returningCustomers as $currentCustomer)
+			{
+				if (CustomerReturns($currentCustomer))
+				{
+					$customers[] = $currentCustomer;
+				}
+			}
+		}
+	}
+	
+	function CustomerReturns($currentCustomer)
+	{
+		global $currentGame;
+		
+		$target = rand(1,10);
+		//This means that the 31st returning customers will not be unhappy that there isn't a seat for him
+		if ($target <= $currentCustomer['happiness'] || $currentCustomer['happiness'] == 10)
+		{
+			$record = "Return, " . $currentCustomer['customer_id'] . " - " .  $currentCustomer['first_name'] . " " . $currentCustomer['last_name'] . " Happy:" . $currentCustomer['happiness'] . " Drink:" . $currentCustomer['drinker_type_id'] . " Food:" . $currentCustomer['eater_type_id'] . " Profession:" . $currentCustomer['profession_id'] . " Stingy:" . $currentCustomer['stinginess'];
+			RecordLedger($_SESSION["userId"], $currentGame["tavern_date"], $record);
+			return true;
+		}
+		else
+		{
+			$currentCustomer['happiness'] -= 1;
+			UpdateCustomer($currentCustomer);
+			return false;
+		}
+	}
+	
+	function GetNewCustomers()
+	{
+		global $currentGame;
+		global $customers;
+		$db = Database::getInstance();
+		
+		
+		$maxNumberOfCustomers = 30;
+		
+		for ($i = count($customers); $i <= $maxNumberOfCustomers; $i++)
+		{
+			$target = rand(1, 10);
+			$newCustomer = CreateCustomer();
+			RecordCustomer($newCustomer);
+			
+			if ($target < $newCustomer['happiness'])
+			{
+				$record = "New, " . $newCustomer['first_name'] . " " . $newCustomer['last_name'] . " Happy: " . $newCustomer['happiness'] . " Drink: " . $newCustomer['drinker_type_id'] . " Food: " . $newCustomer['eater_type_id'] . " Profession: " . $newCustomer['profession_id'] . " Stingy: " . $newCustomer['stinginess'];
+				RecordLedger($_SESSION["userId"], $currentGame["tavern_date"], $record);
+				$customers[] = $newCustomer;
+			}
+		}
+	}
+	
+	function RecordCustomer($customer)
+	{
+		$db = Database::getInstance();
+
+		$sql = "INSERT INTO customers (user_id, first_name, last_name, drinker_type_id, eater_type_id, profession_id, happiness, stinginess, active) VALUES ('" . $_SESSION['userId'] . "', '" .  $customer['first_name'] . "', '" . $customer['last_name'] . "', '" . $customer['drinker_type_id'] . "', '" . $customer['eater_type_id'] . "', '" . $customer['profession_id'] . "', '" . $customer['happiness'] . "', '" . $customer['stinginess'] . "', '1')";
+		$db->query($sql);
+	}
+	
+	function UpdateCustomer($customer)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "UPDATE customers SET happiness=". $customer['happiness'] . " WHERE customer_id=" . $customer['customer_id'];
+		$db->query($sql);
+	}
+	
+	function ServeCustomers()
+	{
+		global $customers;
+		global $currentGame;
+		
+		if (count($customers) > 30)
+		{
+			$customers = array_slice($customers, 0, 30);
+		}
+		
+		foreach($customers as $currentCustomer)
+		{
+			$currentProfession = GetFromTableById("professions" , $currentCustomer['profession_id']);
+			$currentDrinkerType = GetFromTableById("drinkertypes", $currentCustomer['drinker_type_id']);
+			$currentEaterType = GetFromTableById("eatertypes", $currentCustomer['eater_type_id']);
+			
+			$dishPreferences = DetermineDishPreference($currentEaterType);
+			
+			foreach($dishPreferences as $dish => $pref)
+			{
+				$record = $currentCustomer['customer_id'] . " - " .  $currentCustomer['first_name'] . " has a preference of " . $pref . " towards dish " . $dish;
+				RecordLedger($_SESSION["userId"], $currentGame["tavern_date"], $record);
+			}
+		}
+	}
+	
+	function DetermineDishPreference($eaterType)
+	{
+		$preferences = array();
+		$recipes = GetRecipes();
+		
+		foreach($recipes as $currentRecipe)
+		{
+			$preference = 0;
+			if($currentRecipe['poultry_qty'] > 0  && $eaterType['chicken_pref'] > 0)
+			{
+				$preference = $currentRecipe['poultry_qty'] + $eaterType['chicken_pref'];
+			}
+			if($currentRecipe['pork_qty'] > 0  && $eaterType['pork_pref'] > 0)
+			{
+				$preference = $currentRecipe['pork_qty'] + $eaterType['pork_pref'];
+			}
+			if($currentRecipe['carrot_qty'] > 0  && $eaterType['carrot_pref'] > 0)
+			{
+				$preference = $currentRecipe['carrot_qty'] + $eaterType['carrot_pref'];
+			}
+			if($currentRecipe['potato_qty'] > 0  && $eaterType['potato_pref'] > 0)
+			{
+				$preference = $currentRecipe['potato_qty'] + $eaterType['potato_pref'];
+			}
+			
+			$preferences[$currentRecipe['name']] = $preference;
+		}
+		
+		arsort($preferences);
+		
+		return $preferences;
+	}
+	
+	function GetRecipes()
+	{
+		$db = Database::getInstance();
+
+		$sql = "SELECT * FROM recipes";
+		$recipes = $db->query($sql);
+
+		return $recipes;
+	}
+	
+	function GetFromTableById($tableName, $professionId)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM ${tableName} WHERE id = '${professionId}'";
+		$result = $db->query($sql);
+		
+		
+		
+		return $result->fetch_assoc();
 	}
 	
 	function PickDaysCustomers()
@@ -157,40 +321,18 @@
 	
 	function CreateCustomer()
 	{
-		/*$uniqueCustomers = GetCustomerTypes();
-			
-		$newCustomer = GetCustomerById(rand(1, $uniqueCustomers));
-		$newCustomer['happiness'] = rand (1, 10);
-		$newCustomer['stinginess'] = rand (1, 3);
+		$newCustomer = array();
+		$newCustomer["user_id"] = $_SESSION["userId"];
+		$newCustomer["first_name"] = GetRandomFirstName();
+		$newCustomer["last_name"] = GetRandomLastName();
+		$newCustomer["drinker_type_id"] = GetRandomDrinkerType();
+		$newCustomer["eater_type_id"] = GetRandomeaterType();
+		$newCustomer["profession_id"] = GetRandomProfession();
+		$newCustomer["happiness"] = rand (1, 10);
+		$newCustomer["stinginess"] = rand (1, 3);
+		$newCustomer["active"] = true;
 		
-		return $newCustomer;*/
-	}
-	
-	function CalculateNumberOfCustomers()
-	{
-		return 0;//rand(3, 10);
-	}
-	
-	function GetCustomerTypes()
-	{
-		//$db = Database::getInstance();
-		
-		//$sql = "SELECT id FROM customers";
-		//$result = $db->query($sql);
-
-		//return mysqli_num_rows($result);
-	}
-	
-	function GetCustomerById($id)
-	{
-		//$db = Database::getInstance();
-		
-		//$sql = "SELECT * FROM customers WHERE id = '$id'";
-		//$customer = $db->query($sql);
-
-		//$row = $customer->fetch_assoc();
-		
-		//return $row;
+		return $newCustomer;
 	}
 	
 	function CheckForShipments($newOrders)
@@ -225,7 +367,7 @@
 	{
 		$db = Database::getInstance();
 		
-		$sql = "SELECT unit_cost FROM items WHERE unit_name = '$name'";
+		$sql = "SELECT unit_cost FROM items WHERE unit_tag = '$name'";
 		$result = $db->query($sql);
 
 		$row = $result->fetch_assoc();
@@ -246,14 +388,11 @@
 			$keys[] = $key;
 			$values[] = $value;
 		}
-		$keysImploded = implode(", ", $keys);
+		$keysImploded = implode("`, `", $keys);
 		$valuesImploded = implode(" , ", $values);
 		
-		$sql = "INSERT INTO games (" . $keysImploded . ") VALUES (" . $valuesImploded . ")";
+		$sql = "INSERT INTO games (`" . $keysImploded . "`) VALUES (" . $valuesImploded . ")";
     
-		$db->query($sql);
-		
-		$sql = "INSERT INTO test VALUES ('" . $sql ."')";
 		$db->query($sql);
 	}
 
@@ -331,7 +470,7 @@
 	{
 		$numberOfYears = (int)($days / 360)+1;
 		$numberOfMonths = (int)(($days % 360) / 30)+1;
-		$numberOfDays = (int)(($days % 360) % 30)+1;
+		$numberOfDays = (int)(($days % 360) % 30);
 		
 		return "Year: " . $numberOfYears . " Month: " . $numberOfMonths . " Day: " . (int)$numberOfDays;
 	}
@@ -351,7 +490,7 @@
 	{
 		$db = Database::getInstance();
 		
-		$sql = "SELECT record FROM ledgers WHERE (user_id = '$userId') AND (tavern_date = '$tavern_date')";
+		$sql = "SELECT record FROM ledgers WHERE (user_id = '$userId') AND (tavern_date = '$tavernDate')";
 		$ledger = $db->query($sql);
 
 		return $ledger;
@@ -369,10 +508,74 @@
 		
 		foreach($items as $item)
 		{
-			if($currentGame[$item['unit_name']] == 0 && $currentGame[$item['bulk_name']] > 0)
+			if($currentGame[$item['unit_tag']] == 0 && $currentGame[$item['bulk_tag']] > 0)
 			{
-				$currentGame[$item['unit_name']]--;
-				$currentGame[$itme["unit_name"]] += $item['bulk_qty'];
+				$currentGame[$item['unit_tag']]--;
+				$currentGame[$itme["unit_tag"]] += $item['bulk_qty'];
 			}			
 		}
+	}
+	
+	function GetRandomFirstName()
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM firstnames";
+		$names = $db->query($sql);
+		
+		$nameId =  rand(1 , mysqli_num_rows($names));
+		
+		$sql = "SELECT first_name FROM firstnames WHERE (id = '$nameId')";
+		$name = $db->query($sql);
+		
+		$result = $name->fetch_assoc();
+		
+		return $result['first_name'];
+	}
+	
+	function GetRandomLastName()
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM lastnames";
+		$names = $db->query($sql);
+		
+		$nameId =  rand(1 , mysqli_num_rows($names));
+		
+		$sql = "SELECT last_name FROM lastnames WHERE (id = '$nameId')";
+		$name = $db->query($sql);
+		
+		$result = $name->fetch_assoc();
+		
+		return $result['last_name'];
+	}
+	
+	function GetRandomDrinkerType()
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM drinkertypes";
+		$drinkerTypes = $db->query($sql);
+		
+		return rand(1 , mysqli_num_rows($drinkerTypes));
+	}
+	
+	function GetRandomEaterType()
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM eatertypes";
+		$eaterTypes = $db->query($sql);
+		
+		return rand(1 , mysqli_num_rows($eaterTypes));
+	}
+	
+	function GetRandomProfession()
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM professions";
+		$professions = $db->query($sql);
+		
+		return rand(1 , mysqli_num_rows($professions));
 	}

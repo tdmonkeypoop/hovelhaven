@@ -11,7 +11,7 @@ body{
 
 .container {
     display: grid;
-    grid-template-columns: 12% auto 15%;
+    grid-template-columns: 12% auto 5%;
     grid-template-rows: 8% 5% auto 5%;
     grid-tempate-areas:
         "logo"
@@ -115,7 +115,7 @@ body{
 
 .card-container{
     display: grid;
-    grid-template-columns: 2% 20% 2% 20% 2% 13% 2% 37% 2%;
+    grid-template-columns: 1% 15% 1% 24% 1% 13% 1% auto 1%;
     grid-template-rows: 5% auto 5%;
     grid-tempate-areas:
         "summary-card-title"
@@ -126,7 +126,6 @@ body{
         "prices-card"
         "expenses-card"
         "ledger-card";
-    height:100%;
     overflow: hidden;
 }
 
