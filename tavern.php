@@ -41,8 +41,7 @@
 	    <div class="summary">
 	        <div class="summary-item justify-right">Coming Soon</div>
 	        <div class="summary-item justify-right">User Id: <?= $_SESSION["userId"]; ?></div>
-	        <div class="summary-item justify-right">Yesterday's Date: <?=$yesterdayGame["tavern_date"]?></div>
-	        <div class="summary-item justify-right">Current Date: <?=$currentGame["tavern_date"]?></div>
+	        <div class="summary-item justify-right">Customers Today: <?=$_SESSION['numberOfCustomersToday']?></div>
 	    </div>
 	    
 	    <div class="tabs bottomed">
@@ -84,7 +83,7 @@
 	    		Total Earned: $<?= $currentGame["current_money"] - $yesterdayGame["current_money"]?><br>
 	    		Ale sold: <?= $yesterdayGame["unit_ale"] - $currentGame["unit_ale"] ?><br>
 	    		Wine sold: <?= $yesterdayGame["unit_wine"] - $currentGame["unit_wine"] ?><br>
-	    		Poultry sold: <br>
+	    		Poultry sold: <!--Add These In Later when we solve the open bulk--> <br>
 	    		Pork sold: <br>
 	    		Carrot sold: <br>
 	    		Potato sold: <br>
@@ -118,7 +117,7 @@
 	    	<div class="expenses-card card">
 				<?php foreach($items as $item): ?>
 					<?=$item["unit_name"]?>: <?=$currentGame[$item["unit_tag"]]?><br>
-					<?=$item["bulk_name"]?>: <?=$currentGame[$item["bulk_tag"]]?><br>
+					<?=$item["bulk_name"]?>: <?=$currentGame[$item["bulk_tag"]]?> (<?=$currentGame["{$item['bulk_tag']}_on_order"]?>)<br>
 				<?php endforeach; ?>
 	    	</div>
 	    	<div class="ledger-card card">

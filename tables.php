@@ -19,82 +19,92 @@
     /*************************************
      * users
      *************************************/
-    $sql = "CREATE TABLE users (id INT AUTO_INCREMENT PRIMARY KEY NOT NULL, username TEXT NOT NULL, password TEXT NOT NULL)";
+    $sql = "CREATE TABLE users 
+    (
+        id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+        username TEXT NOT NULL,
+        password TEXT NOT NULL
+    )";
+    
     $db->query($sql);
-    /*
-        id
-        username
-        password
-    */
-
+    
     /*************************************
      * games
      *************************************/
-    $sql = "CREATE TABLE games (user_id INT, tavern_date INT DEFAULT 0, current_money INT DEFAULT 250, unit_ale INT DEFAULT 0, bulk_ale INT DEFAULT 0, unit_wine INT DEFAULT 0, bulk_wine INT DEFAULT 0, unit_poultry INT DEFAULT 0, bulk_poultry INT DEFAULT 0, unit_pork INT DEFAULT 0, bulk_pork INT DEFAULT 0, unit_carrot INT DEFAULT 0, bulk_carrot INT DEFAULT 0, unit_potato INT DEFAULT 0, bulk_potato INT DEFAULT 0, unit_ale_price INT DEFAULT 4, unit_wine_price INT DEFAULT 8, `Chicken Wings_price` INT DEFAULT 6, `Pigs in the Coop_price` INT DEFAULT 14, `Homestyle Chicken_price` INT DEFAULT 7, `Chicken Hash_price` INT DEFAULT 7, `Chicken Pot Pie_price` INT DEFAULT 8, `Pork Chops_price` INT DEFAULT 6, `Homestyle Pork_price` INT DEFAULT 9, `Pork Hash_price` INT DEFAULT 9, `Stew_price` INT DEFAULT 10, `Carrot Broth_price` INT DEFAULT 1, `Steamed Veggies_price` INT DEFAULT 2, `Mashed Potatoes_price` INT DEFAULT 1)";
+    $sql = "CREATE TABLE games
+    (
+        user_id INT,
+        tavern_date INT DEFAULT 0,
+        current_money INT DEFAULT 250,
+        unit_ale INT DEFAULT 0,
+        bulk_ale INT DEFAULT 0,
+        bulk_ale_on_order INT DEFAULT 0,
+        unit_wine INT DEFAULT 0,
+        bulk_wine INT DEFAULT 0,
+        bulk_wine_on_order INT DEFAULT 0,
+        unit_poultry INT DEFAULT 0,
+        bulk_poultry INT DEFAULT 0,
+        bulk_poultry_on_order INT DEFAULT 0,
+        unit_pork INT DEFAULT 0,
+        bulk_pork INT DEFAULT 0,
+        bulk_pork_on_order INT DEFAULT 0,
+        unit_carrot INT DEFAULT 0,
+        bulk_carrot INT DEFAULT 0,
+        bulk_carrot_on_order INT DEFAULT 0,
+        unit_potato INT DEFAULT 0,
+        bulk_potato INT DEFAULT 0,
+        bulk_potato_on_order INT DEFAULT 0,
+        unit_ale_price INT DEFAULT 4,
+        unit_wine_price INT DEFAULT 8,
+        `Chicken Wings_price` INT DEFAULT 6,
+        `Pigs in the Coop_price` INT DEFAULT 14,
+        `Homestyle Chicken_price` INT DEFAULT 7,
+        `Chicken Hash_price` INT DEFAULT 7,
+        `Chicken Pot Pie_price` INT DEFAULT 8,
+        `Pork Chops_price` INT DEFAULT 8,
+        `Homestyle Pork_price` INT DEFAULT 9,
+        `Pork Hash_price` INT DEFAULT 9,
+        `Stew_price` INT DEFAULT 10,
+        `Carrot Broth_price` INT DEFAULT 1,
+        `Steamed Veggies_price` INT DEFAULT 2,
+        `Mashed Potatoes_price` INT DEFAULT 1
+        )";
+    
     $db->query($sql);
-    /*
-        user_id                     INT
-        tavern_date                 INT DEFAULT 0
-        current_money               INT DEFAULT 250
-        unit_ale                    INT DEFAULT 0
-        bulk_ale                    INT DEFAULT 0
-        unit_wine                   INT DEFAULT 0
-        bulk_wine                   INT DEFAULT 0
-        unit_poultry                INT DEFAULT 0
-        bulk_poultry                INT DEFAULT 0
-        unit_pork                   INT DEFAULT 0
-        bulk_pork                   INT DEFAULT 0
-        unit_carrot                 INT DEFAULT 0
-        bulk_carrot                 INT DEFAULT 0
-        unit_potato                 INT DEFAULT 0
-        bulk_potato                 INT DEFAULT 0
-        unit_ale_price              INT DEFAULT 4
-        unit_wine_price             INT DEFAULT 8
-        Chicken Wings_price         INT DEFAULT 6
-        Pigs in the Coop_price      INT DEFAULT 14
-        Homestyle Chicken_price     INT DEFAULT 7
-        Chicken Hash_price          INT DEFAULT 7
-        Chicken Pot Pie_price       INT DEFAULT 8
-        Pork Chops_price            INT DEFAULT 6
-        Homestyle Pork_price        INT DEFAULT 9
-        Pork Hash_price             INT DEFAULT 9
-        Stew_price                  INT DEFAULT 10
-        Carrot Broth_price          INT DEFAULT 1
-        Steamed Veggies_price       INT DEFAULT 2
-        Mashed Potatoes_price       INT DEFAULT 1
-    */
     
     /*************************************
      * ledgers
      *************************************/
-    $sql = "CREATE TABLE ledgers (user_id INT, tavern_date INT NOT NULL, record TEXT)";
+    $sql = "CREATE TABLE ledgers
+    (
+        user_id INT,
+        tavern_date INT NOT NULL,
+        record TEXT
+    )";
+    
     $db->query($sql);
-    /*
-        user_id     INT
-        tavern_date INT
-        record      INT
-    */
     
     /*************************************
      * items
      *************************************/
-    $sql = "CREATE TABLE items (id INT PRIMARY KEY AUTO_INCREMENT, unit_name TEXT, unit_tag TEXT, unit_cost INT, bulk_name TEXT, bulk_tag TEXT, bulk_cost INT, bulk_qty INT)";
+    $sql = "CREATE TABLE items
+    (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        unit_name TEXT,
+        unit_tag TEXT,
+        unit_cost INT,
+        bulk_name TEXT,
+        bulk_tag TEXT,
+        bulk_cost INT,
+        bulk_qty INT
+    )";
+    
     $db->query($sql);
-    /*
-        id          INT PKEY
-        unit_name   TEXT
-        unit_tag   TEXT
-        unit_cost   INT
-        bulk_name   TEXT
-        bulk_tag   TEXT
-        bulk_cost   INT
-        bulk_qty    INT
-    */
     
     $items = array();
     $items[] = [1, "'Mug of Ale'",   "'unit_ale'",    4, "'Keg of Ale'",  "'bulk_ale'",      116,    29];
     $items[] = [2, "'Glass of Wine'",  "'unit_wine'",    8, "'Bottle of Wine'",  "'bulk_wine'",     48,     48];
-    $items[] = [3, "'Poultry'",  "'unit_poultry'", 6, "'Hen'",  "'bulk_poultry'",  24,     24];
+    $items[] = [3, "'Poultry'",  "'unit_poultry'", 6, "'Hen'",  "'bulk_poultry'",  144,     24];
     $items[] = [4, "'Pork'",  "'unit_pork'",    8, "'Pig'",  "'bulk_pork'",     176,    22];
     $items[] = [5, "'Carrot'",  "'unit_carrot'",  1, "'Bag of Carrots'",  "'bulk_carrot'",   10,     10];
     $items[] = [6, "'Potato'",  "'unit_potato'",  1, "'Sack of Potatoes'",  "'bulk_potato'",   8,      8];
@@ -111,17 +121,17 @@
     /*************************************
      * recipes
      *************************************/
-    $sql = "CREATE TABLE recipes (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, poultry_qty INT, pork_qty INT, carrot_qty INT, potato_qty INT)";
+    $sql = "CREATE TABLE recipes
+    (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name TEXT NOT NULL,
+        poultry_qty INT,
+        pork_qty INT,
+        carrot_qty INT,
+        potato_qty INT
+    )";
+    
     $db->query($sql);
-     
-    /*
-        id              INT PKEY
-        name            TEXT
-        poultry_qty     INT
-        pork_qty        INT
-        carrot_qty      INT
-        potato_qty      INT
-    */
     
     $recipes[] = [1,  "'Chicken Wings'",     1, 0, 0, 0];
     $recipes[] = [2,  "'Pigs in the Coop'",  1, 1, 0, 0];
@@ -148,41 +158,43 @@
      /*************************************
      * customers
      *************************************/
-    $sql = 'CREATE TABLE customers (customer_id INT PRIMARY KEY AUTO_INCREMENT, user_id INT, first_name TEXT, last_name TEXT, drinker_type_id INT, eater_type_id INT, profession_id INT, happiness INT, stinginess INT, active BOOL)';
+    $sql = 'CREATE TABLE customers 
+    (
+        customer_id INT PRIMARY KEY AUTO_INCREMENT,
+        user_id INT,
+        first_name TEXT,
+        last_name TEXT,
+        drinker_type_id INT,
+        eater_type_id INT,
+        profession_id INT,
+        happiness INT,
+        stinginess INT,
+        active BOOL
+    )';
+    
     $db->query($sql);
-    /*
-        customer_id     INT PRIMARY KEY AUTO_INCREMENT
-        user_id         INT
-        first_name      TEXT
-        last_name       TEXT
-        drinker_type_id   INT
-        eater_type_id    INT
-        profession_id   INT
-        happiness       INT
-        stinginess      INT
-        active          BOOL
-    */
     
     /*************************************
      * eatertypes
      *************************************/
-    $sql = "CREATE TABLE eatertypes (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, chicken_pref INT, pork_chop_pref INT, carrot_pref INT, potato_pref INT)";
+    $sql = "CREATE TABLE eatertypes 
+    (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name TEXT NOT NULL,
+        chicken_pref INT,
+        pork_pref INT,
+        carrot_pref INT,
+        potato_pref INT
+    )";
+    
     $db->query($sql);
-    /*
-        id              INT PKEY
-        name            TEXT
-        chicken_pref    INT
-        pork_pref       INT
-        carrot_pref     INT
-        potato_pref     INT
-    */
     
     $eaterTypes = array();
-    $eaterTypes[] = [1, '"Vegetarian"',      0, 0, 1, 1];
-    $eaterTypes[] = [2, '"Meat Lover"',      1, 1, 0, 0];
-    $eaterTypes[] = [3, '"Muslim"',          1, 0, 1, 1];
-    $eaterTypes[] = [4, '"Porker"',          0, 1, 0, 1];
-    $eaterTypes[] = [5, '"Rabbit"',          0, 0, 1, 0];
+    $eaterTypes[] = [1, '"Vegetarian"',      -10, -10, 1, 1];
+    $eaterTypes[] = [2, '"Meat Lover"',      1, 1, -1, -1];
+    $eaterTypes[] = [3, '"Muslim"',          1, -10, 1, 1];
+    $eaterTypes[] = [4, '"Porker"',          -1, 1, 0, 1];
+    $eaterTypes[] = [5, '"Rabbit"',          -1, -1, 1, 0];
     
     $eaterTypesImploded = array();
     for($i = 0; $i < count($eaterTypes); $i++)
@@ -196,15 +208,16 @@
     /*************************************
      * drinkertypes
      *************************************/
-    $sql = "CREATE TABLE drinkertypes (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, ale_pref INT, wine_pref INT)";
+    $sql = "CREATE TABLE drinkertypes 
+    (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name TEXT NOT NULL,
+        ale_pref INT,
+        wine_pref INT
+    )";
+    
     $db->query($sql);
-    /*
-        id              INT PKEY
-        name            TEXT
-        ale_pref        INT
-        wine_pref       INT
-    */
-
+    
     $drinkerTypes = array();
     $drinkerTypes[] = [1, '"Drunk"',          5, 1];
     $drinkerTypes[] = [2, '"Oenophiliac"',    1, 5];
@@ -222,18 +235,19 @@
     /*************************************
      * professions
      *************************************/
-    $sql = "CREATE TABLE professions (id INT PRIMARY KEY AUTO_INCREMENT, name TEXT NOT NULL, daily_wage INT, allowance_for_food INT, religious INT)";
+    $sql = "CREATE TABLE professions 
+    (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        name TEXT NOT NULL,
+        daily_wage INT,
+        allowance_for_food INT,
+        religious INT
+    )";
+    
     $db->query($sql);
-    /*
-        id                      INT PKEY
-        name                    TEXT
-        daily_wage              INT
-        allowance_for_food      INT
-        religious               INT (Scale of 1 - 10)
-    */
     
     $professions = array();
-    $professions[] = [1, '"Laborer"', 9, 7, 5];
+    $professions[] = [1, '"Laborer"', 9, 15, 5];
     
     $professionsImploded = array();
     for($i = 0; $i < count($professions); $i++)
@@ -247,13 +261,14 @@
     /*************************************
      * calender
      *************************************/
-    $sql = "CREATE TABLE calendar (date INT, name TEXT NOT NULL, religious BOOL)";
+    $sql = "CREATE TABLE calendar
+    (
+        date INT,
+        name TEXT NOT NULL,
+        religious BOOL
+    )";
+
     $db->query($sql);
-    /*
-        date        INT
-        name        INT
-        religious   BOOL
-    */
 
     $calendar = array();
     
@@ -290,12 +305,13 @@
     /*************************************
      * firstnames
      *************************************/
-    $sql = "CREATE TABLE firstnames (id INT PRIMARY KEY AUTO_INCREMENT, first_name TEXT)";
+    $sql = "CREATE TABLE firstnames 
+    (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        first_name TEXT
+    )";
+    
     $db->query($sql);
-    /*
-        id          INT PKEY
-        first_name  TEXT
-    */
     
     $firstNames = array();
     $firstNames[] = "('Abrielle')";
@@ -473,12 +489,13 @@
     /*************************************
      * lastnames
      *************************************/
-    $sql = "CREATE TABLE lastnames (id INT PRIMARY KEY AUTO_INCREMENT, last_name TEXT)";
+    $sql = "CREATE TABLE lastnames
+    (
+        id INT PRIMARY KEY AUTO_INCREMENT,
+        last_name TEXT
+    )";
+    
     $db->query($sql);
-    /*
-        id          INT PKEY
-        last_name  TEXT
-    */
     
     $lastNames[] = "('Thoraded')";
     $lastNames[] = "('Gilar')";

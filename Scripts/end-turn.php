@@ -1,7 +1,8 @@
 <?php
 	session_start();
 
-	require("database.php");
+	//require_once("database.php");
+	require_once("customer.php");
 	
 	if (empty($_SESSION["userId"]))
 	{
@@ -12,8 +13,6 @@
 	
 	if ($_SERVER['REQUEST_METHOD'] === 'POST')
 	{
-		
-		
 		$inputArray = array();
 		$currentGame["unit_ale_price"]			= htmlspecialchars(stripslashes(trim($_POST["unitAlePrice"])));
 		$currentGame["unit_wine_price"] 		= htmlspecialchars(stripslashes(trim($_POST["unitWineprice"])));
@@ -29,62 +28,97 @@
 		$currentGame["Carrot Broth_price"]		= htmlspecialchars(stripslashes(trim($_POST["carrotBrothPrice"])));
 		$currentGame["Steamed Veggies_price"]	= htmlspecialchars(stripslashes(trim($_POST["steamedVeggiesPrice"])));
 		$currentGame["Mashed Potatoes_price"]	= htmlspecialchars(stripslashes(trim($_POST["mashedPotatoesPrice"])));
-		$inputArray["orderale"]					= htmlspecialchars(stripslashes(trim($_POST["orderale"])));
-		$inputArray["orderwine"] 				= htmlspecialchars(stripslashes(trim($_POST["orderwine"])));
-		$inputArray["orderchicken"]				= htmlspecialchars(stripslashes(trim($_POST["orderchicken"])));
-		$inputArray["orderpig"]					= htmlspecialchars(stripslashes(trim($_POST["orderpig"])));
-		$inputArray["ordercarrot"]				= htmlspecialchars(stripslashes(trim($_POST["ordercarrot"])));
-		$inputArray["orderpotato"]				= htmlspecialchars(stripslashes(trim($_POST["orderpotato"])));
+		$inputArray["bulk_ale"]					= htmlspecialchars(stripslashes(trim($_POST["bulk_ale"])));
+		$inputArray["bulk_wine"]				= htmlspecialchars(stripslashes(trim($_POST["bulk_wine"])));
+		$inputArray["bulk_poultry"]				= htmlspecialchars(stripslashes(trim($_POST["bulk_poultry"])));
+		$inputArray["bulk_pork"]				= htmlspecialchars(stripslashes(trim($_POST["bulk_pork"])));
+		$inputArray["bulk_carrot"]				= htmlspecialchars(stripslashes(trim($_POST["bulk_carrot"])));
+		$inputArray["bulk_potato"]				= htmlspecialchars(stripslashes(trim($_POST["bulk_potato"])));
 		
 		$customers = array();
 		
+		ReceiveOrders();
 		GetReturningCustomers();
 		GetNewCustomers();
 		ServeCustomers();
-		//ReceiveOrders(if Monday)
-		//RecordCustomers
 		RecordDay();
 		
+		$_SESSION['numberOfCustomersToday'] = count($customers);
+		
 		header("location: ../tavern.php");
+	}
+	
+	function ReceiveOrders()
+	{
+		global $currentGame;
+		global $inputArray;
+		
+		foreach($inputArray as $itemName=>$qtyToOrder)
+		{
+			$priceOfBulkItem = GetBulkItemCostByName($itemName);
+			
+			while($qtyToOrder > 0)
+			{
+				if ($currentGame['current_money'] >= $priceOfBulkItem)
+				{
+					$currentGame['current_money'] -= $priceOfBulkItem;
+					$currentGame["{$itemName}_on_order"] += 1;
+				}
+				
+				$qtyToOrder--;
+			}
+		}
+		
+		if($currentGame['tavern_date'] % 6 == 0)
+		{
+			foreach($currentGame as $key=>$value)
+			{
+				$columnName = split("_", $key);
+				if($columnName[0] == "bulk"  && count($columnName) == 2)
+				{
+					$currentGame[$key] += $currentGame["{$key}_on_order"];
+					$currentGame["{$key}_on_order"] = 0;
+				}
+			}
+		}
+	}
+	
+	function GetRowById($tableName, $id)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM {$tableName} WHERE id = '{$id}'";
+		return $db->query($sql)->fetch_assoc();
 	}
 	
 	function GetReturningCustomers()
 	{
 		global $customers;
+		global $currentGame;
 		$db = Database::getInstance();
 		
-		$sql = "SELECT * FROM customers";
+		$sql = "SELECT * FROM customers WHERE active=1 AND user_id={$_SESSION['userId']}";
 		$returningCustomers = $db->query($sql);
 
 		if (!empty($returningCustomers))
 		{
 			foreach($returningCustomers as $currentCustomer)
 			{
-				if (CustomerReturns($currentCustomer))
+				$loadedCustomer = new Customer($_SESSION['userId'], $currentCustomer['customer_id']);
+				
+				if(count($customers) < 30)
 				{
-					$customers[] = $currentCustomer;
+					if ($loadedCustomer->CustomerReturns())
+					{
+						$customers[] = $loadedCustomer;
+					}
+					else
+					{
+						$loadedCustomer->UpdateHappiness($loadedCustomer->happiness - 1);
+					}
 				}
+				$loadedCustomer->UpdateHappiness($loadedCustomer->happiness - 1);
 			}
-		}
-	}
-	
-	function CustomerReturns($currentCustomer)
-	{
-		global $currentGame;
-		
-		$target = rand(1,10);
-		//This means that the 31st returning customers will not be unhappy that there isn't a seat for him
-		if ($target <= $currentCustomer['happiness'] || $currentCustomer['happiness'] == 10)
-		{
-			$record = "Return, " . $currentCustomer['customer_id'] . " - " .  $currentCustomer['first_name'] . " " . $currentCustomer['last_name'] . " Happy:" . $currentCustomer['happiness'] . " Drink:" . $currentCustomer['drinker_type_id'] . " Food:" . $currentCustomer['eater_type_id'] . " Profession:" . $currentCustomer['profession_id'] . " Stingy:" . $currentCustomer['stinginess'];
-			RecordLedger($_SESSION["userId"], $currentGame["tavern_date"], $record);
-			return true;
-		}
-		else
-		{
-			$currentCustomer['happiness'] -= 1;
-			UpdateCustomer($currentCustomer);
-			return false;
 		}
 	}
 	
@@ -94,273 +128,253 @@
 		global $customers;
 		$db = Database::getInstance();
 		
-		
-		$maxNumberOfCustomers = 30;
-		
-		for ($i = count($customers); $i <= $maxNumberOfCustomers; $i++)
+		for ($i = count($customers); $i < 30; $i++)
 		{
-			$target = rand(1, 10);
-			$newCustomer = CreateCustomer();
-			RecordCustomer($newCustomer);
+			$newCustomer = new Customer($_SESSION['userId']);
+			$newCustomer->RecordCustomer();
 			
-			if ($target < $newCustomer['happiness'])
+			if ($newCustomer->CustomerReturns())
 			{
-				$record = "New, " . $newCustomer['first_name'] . " " . $newCustomer['last_name'] . " Happy: " . $newCustomer['happiness'] . " Drink: " . $newCustomer['drinker_type_id'] . " Food: " . $newCustomer['eater_type_id'] . " Profession: " . $newCustomer['profession_id'] . " Stingy: " . $newCustomer['stinginess'];
-				RecordLedger($_SESSION["userId"], $currentGame["tavern_date"], $record);
 				$customers[] = $newCustomer;
 			}
 		}
-	}
-	
-	function RecordCustomer($customer)
-	{
-		$db = Database::getInstance();
-
-		$sql = "INSERT INTO customers (user_id, first_name, last_name, drinker_type_id, eater_type_id, profession_id, happiness, stinginess, active) VALUES ('" . $_SESSION['userId'] . "', '" .  $customer['first_name'] . "', '" . $customer['last_name'] . "', '" . $customer['drinker_type_id'] . "', '" . $customer['eater_type_id'] . "', '" . $customer['profession_id'] . "', '" . $customer['happiness'] . "', '" . $customer['stinginess'] . "', '1')";
-		$db->query($sql);
-	}
-	
-	function UpdateCustomer($customer)
-	{
-		$db = Database::getInstance();
-		
-		$sql = "UPDATE customers SET happiness=". $customer['happiness'] . " WHERE customer_id=" . $customer['customer_id'];
-		$db->query($sql);
 	}
 	
 	function ServeCustomers()
 	{
 		global $customers;
 		global $currentGame;
-		
-		if (count($customers) > 30)
-		{
-			$customers = array_slice($customers, 0, 30);
-		}
-		
+
 		foreach($customers as $currentCustomer)
 		{
-			$currentProfession = GetFromTableById("professions" , $currentCustomer['profession_id']);
-			$currentDrinkerType = GetFromTableById("drinkertypes", $currentCustomer['drinker_type_id']);
-			$currentEaterType = GetFromTableById("eatertypes", $currentCustomer['eater_type_id']);
+			$dishPreferences = $currentCustomer->GetDishPreferences();
+			$fed = false;
+			$attempts = 0;
+			$record = "I didn't make it into the if statement";
 			
-			$dishPreferences = DetermineDishPreference($currentEaterType);
-			
-			foreach($dishPreferences as $dish => $pref)
+			while($currentCustomer->happiness > 0 && !$fed && $attempts < 5)
 			{
-				$record = $currentCustomer['customer_id'] . " - " .  $currentCustomer['first_name'] . " has a preference of " . $pref . " towards dish " . $dish;
+				$dish = PlaceOrder($dishPreferences);
+				
+				$canAfford = CanAfford($dish, $currentCustomer);
+				$haveIngredients = HaveIngredients($dish); 
+
+				if ($canAfford && $haveIngredients)
+				{
+					$currentCustomer->happiness += GetHappinesModifierFromSalesTemperment($dish, $currentCustomer);
+					$currentCustomer->UpdateHappiness($currentCustomer->happiness);
+					
+					if($currentCustomer->happiness >= 0)
+					{
+						FeedDish($currentCustomer, $dish);
+						$record = "{$currentCustomer->customerId} bought {$dish} and left happy, $currentCustomer->happiness";
+						$fed = true;
+					}
+				}
+				elseif($canAfford)
+				{
+					$record = "{$currentCustomer->customerId} can Afford but {$dish} is not on the menu";
+					//$record = "{$currentCustomer->customerId}-{$currentCustomer->firstName} Happy: {$currentCustomer->happiness} unhappy you lack ingredients for {$dish}";
+				}
+				elseif($haveIngredients)
+				{
+					$happinessModifier = GetHappinesModifierFromSalesTemperment($dish, $currentCustomer);
+					$currentCustomer->happiness += $happinessModifier;
+					$currentCustomer->UpdateHappiness($currentCustomer->happiness);
+					
+					$record = "Customer {$currentCustomer->customerId} couldn't afford {$dish}, happiness updated by {$happinessModifier}";
+					//$record = "{$currentCustomer->customerId}-{$currentCustomer->firstName} Happy: {$currentCustomer->happiness} storms out over price of {$dish}";
+				}
+				else
+				{
+					$attempts--;
+				}
+				
+				if($attempts ==	5)
+				{
+					$currentCustomer->happiness = $currentCustomer->happiness - 2;
+					$currentCustomer->UpdateHappiness($currentCustomer->happiness);
+					
+					$record = "{$currentCustomer->customerId} left after 5 attempts";
+				}
+				$attempts++;
 				RecordLedger($_SESSION["userId"], $currentGame["tavern_date"], $record);
 			}
 		}
 	}
 	
-	function DetermineDishPreference($eaterType)
+	function GetHappinesModifierFromSalesTemperment($dishName, $customer)
 	{
-		$preferences = array();
-		$recipes = GetRecipes();
+		$dishPrice = GetDishPriceByName($dishName);
+		$basePrice = GetDishBasePriceByName($dishName);
+		$profitMargin = $dishPrice / $basePrice;
 		
-		foreach($recipes as $currentRecipe)
-		{
-			$preference = 0;
-			if($currentRecipe['poultry_qty'] > 0  && $eaterType['chicken_pref'] > 0)
-			{
-				$preference = $currentRecipe['poultry_qty'] + $eaterType['chicken_pref'];
-			}
-			if($currentRecipe['pork_qty'] > 0  && $eaterType['pork_pref'] > 0)
-			{
-				$preference = $currentRecipe['pork_qty'] + $eaterType['pork_pref'];
-			}
-			if($currentRecipe['carrot_qty'] > 0  && $eaterType['carrot_pref'] > 0)
-			{
-				$preference = $currentRecipe['carrot_qty'] + $eaterType['carrot_pref'];
-			}
-			if($currentRecipe['potato_qty'] > 0  && $eaterType['potato_pref'] > 0)
-			{
-				$preference = $currentRecipe['potato_qty'] + $eaterType['potato_pref'];
-			}
-			
-			$preferences[$currentRecipe['name']] = $preference;
-		}
+		$marginModifier = profitMargin - 1.25;
+		$happinessModifier = $marginModifier * $customer->stinginess;
 		
-		arsort($preferences);
-		
-		return $preferences;
+		return $happinessModifier;
 	}
 	
-	function GetRecipes()
-	{
-		$db = Database::getInstance();
-
-		$sql = "SELECT * FROM recipes";
-		$recipes = $db->query($sql);
-
-		return $recipes;
-	}
-	
-	function GetFromTableById($tableName, $professionId)
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT * FROM ${tableName} WHERE id = '${professionId}'";
-		$result = $db->query($sql);
-		
-		
-		
-		return $result->fetch_assoc();
-	}
-	
-	function PickDaysCustomers()
+	function FeedDish($currentCustomer, $dishName)
 	{
 		global $currentGame;
 		
-		$numberOfCustomers	= CalculateNumberOfCustomers();
-		$aleProfitPercent	= ($currentGame["unit_ale_price"] / GetItemCostByName("unit_ale")) - 1.25;
-		$wineProfitPercent	= ($currentGame["unit_wine_price"] / GetItemCostByName("unit_wine")) - 1.25;
+		$ingredients = GetRecipeByName($dishName);
 		
-		for ($i = 0; $i < $numberOfCustomers; $i++)
+		$totalIngredients = 0;
+		$dishPrice = GetDishPriceByName($dishName);
+
+		
+		foreach($ingredients as $columnName=>$qty)
 		{
-			$customer = CreateCustomer();
-	
-			$customerTotalResponse =  $i ."-" . $customer["name"] . " drank ";
-			$customerTotalWine = 0;
-			$customerTotalAle = 0;
+			$ingredient = split("_", $columnName);
 			
-			while ($customer['happiness'] > 0)
+			if(count($ingredient) > 1 && $ingredient[1] == "qty")
 			{
-				$customerResponse =  $i ."-" . $customer["name"] . "(H,S)-(" . $customer['happiness'] . "," . $customer['stinginess'] . ") ";
-		
-				$drinkChance = rand (1, ($customer['ale_pref'] + $customer['wine_pref']));
+				$bulkQtyString = "bulk_{$ingredient[0]}";
+				$unitQtyString = "unit_{$ingredient[0]}";
 				
-				$drinkChoice = rand (1, $drinkChance);
+				$currentGame[$unitQtyString] -= $qty;
+				$totalIngredients += $qty;
 				
-				$currentGame = OpenCases($currentGame);
-				
-				if ($drinkChoice <= $customer["ale_pref"])
+				if($currentGame[$unitQtyString] < 0)
 				{
-					if ($currentGame["unit_ale"] > 0)
-					{
-						$stingyFactor = $aleProfitPercent * $customer['stinginess'];
-						
-						if ($stingyFactor < 0)
-							$stingyFactor = 0;
-						
-						$customer['happiness'] -= $stingyFactor + 1;
-						
-						if ($customer['happiness'] >= -5)
-						{
-							$customerTotalAle++;
-							$currentGame = GiveCustomerAle($currentGame);	
-							RecordLedger($currentGame["user_id"], $currentGame["tavern_date"], $customerResponse . "ale ". $currentGame['unit_ale'] . " remain.");
-						}
-						else if ($customer['happiness'] < -5 && $customerTotalWine == 0 && $customerTotalAle == 0)
-						{
-							RecordLedger($currentGame["user_id"], $currentGame["tavern_date"], $customerResponse . "left angry (ale price)");
-						}
-						else
-						{
-							RecordLedger($currentGame["user_id"], $currentGame["tavern_date"],  $customerResponse . "left happy");
-						}
-					}
-					else 
-					{
-						$customer['happiness'] -= 3;
-						RecordLedger($currentGame["user_id"], $currentGame["tavern_date"],  $customerResponse . "angry for ale");
-					}
+					OpenCases();
 				}
-				else
+			}
+		}
+		
+		$currentGame['current_money'] += $dishPrice;
+		$currentCustomer->allowance -= $dishPrice;
+		$currentCustomer->happiness += $totalIngredients;
+		$currentCustomer->UpdateHappiness($currentCustomer->happiness);
+	}
+	
+	function CanAfford($dishName, $customer)
+	{
+		$dishPrice = GetDishPriceByName($dishName);
+		
+		if($dishPrice <= $customer->allowance)
+			return true;
+		else
+			return false;
+	}
+	
+	function GetDishPriceByName($dishName)
+	{
+		global $currentGame;
+		
+		$columnName = "{$dishName}_price";
+		
+		return $currentGame[$columnName];
+	}
+	
+	function GetDishBasePriceByName($dishName)
+	{
+		$ingredients = GetRecipeByName($dishName);
+		
+		$totalPrice = 0;
+		
+		foreach($ingredients as $columnName=>$qty)
+		{
+			$ingredient = split("_", $columnName);
+			
+			if(count($ingredient) > 1 && $ingredient[1] == "qty")
+			{
+				$totalPrice += GetIngredientBasePrice("unit_{$ingredient[0]}")*$qty;
+			}
+		}
+		
+		return $totalPrice;
+	}
+	
+	function GetIngredientBasePrice($ingredient)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM items WHERE unit_tag='$ingredient'";
+		$ingredientRow = $db->query($sql)->fetch_assoc();
+		
+		return $ingredientRow['unit_cost'];
+	}
+	
+	function HaveIngredients($dishName)
+	{
+		global $currentGame;
+		
+		$ingredients = GetRecipeByName($dishName);
+
+		foreach($ingredients as $columnName=>$qty)
+		{
+			if(!empty($qty))
+			{
+				$ingredient = split("_", $columnName);
+				
+				if(count($ingredient) > 1 && $ingredient[1] == "qty")
 				{
-					if ($currentGame["unit_wine"] > 0)
+					$unitQtyString = "unit_{$ingredient[0]}";
+					$bulkQtyString = "bulk_{$ingredient[0]}";
+					if($currentGame[$unitQtyString] < $qty && $currentGame["$bulkQtyString"] < 1)
 					{
-						$stingyFactor = $wineProfitPercent * $customer['stinginess'];
-						
-						if ($stingyFactor < 0)
-							$stingyFactor = 0;
-							
-						$customer['happiness'] -= $stingyFactor + 1;
-						
-						if ($customer['happiness'] >= -5)
-						{
-							$customerTotalWine++;
-							$currentGame = GiveCustomerWine($currentGame);	
-							RecordLedger($currentGame["unit_id"], $currentGame["tavern_date"], $customerResponse . "wine " . $currentGame['unit_wine'] . " remain");
-						}
-						else if ($customer['happiness'] < -5 && $customerTotalWine == 0 && $customerTotalAle == 0)
-						{
-							RecordLedger($currentGame["unit_id"], $currentGame["tavern_date"], $customerResponse . "left angry (wine price)");
-						}
-						else
-						{
-							RecordLedger($currentGame["unit_id"], $currentGame["tavern_date"],  $customerResponse . "left happy");
-						}
-					}
-					else 
-					{
-						$customer['happiness'] -= 3;
-						RecordLedger($currentGame["unit_id"], $currentGame["tavern_date"],  $customerResponse . "angry for wine");
+						return false;
 					}
 				}
 			}
 		}
+		
+		return true;
 	}
 	
-	function GiveCustomerAle()
+	function PlaceOrder($arrayOfItems)
 	{
-		global $currentGame;
+		$totalValue = 0;
 		
-		$currentGame['unit_ale']--;
-		$currentGame['current_money'] += $currentGame['unit_ale_price'];
-	}
-	
-	function GiveCustomerWine()
-	{
-		global $currentGame;
-		
-		$currentGame['unit_wine']--;
-		$currentGame['current_money'] += $currentGame['glass_wine_price'];
-	}
-	
-	function CreateCustomer()
-	{
-		$newCustomer = array();
-		$newCustomer["user_id"] = $_SESSION["userId"];
-		$newCustomer["first_name"] = GetRandomFirstName();
-		$newCustomer["last_name"] = GetRandomLastName();
-		$newCustomer["drinker_type_id"] = GetRandomDrinkerType();
-		$newCustomer["eater_type_id"] = GetRandomeaterType();
-		$newCustomer["profession_id"] = GetRandomProfession();
-		$newCustomer["happiness"] = rand (1, 10);
-		$newCustomer["stinginess"] = rand (1, 3);
-		$newCustomer["active"] = true;
-		
-		return $newCustomer;
-	}
-	
-	function CheckForShipments($newOrders)
-	{
-		//need to add bulk_orders to games table
-		global $currentGame;
-		
-		if ($newAleOrder > 0)
+		foreach($arrayOfItems as $itemName=>$itemPref)
 		{
-			while($currentGame["current_money"] >= GetItemCostByName("bulk_ale") && $newAleOrder > 0)
-			{
-				$currentGame["current_money"] -= GetItemCostByName("bulk_ale");
-				$currentGame["bulk_ale"]++;
-				$newAleOrder--;
-			}
-			
+			if($itemPref > 0)
+				$totalValue += $itemPref;
 		}
 		
-		if ($newWineOrder > 0)
+		$choiceValue = rand(1, $totalValue);
+		
+		$choice = 0;
+		foreach($arrayOfItems as $itemName=>$itemPref)
 		{
-			while($currentGame["current_money"] >= GetItemCostByName("bulk_wine") && $newWineOrder > 0)
-			{
-				$currentGame["current_money"] -= GetItemCostByName("bulk_wine");
-				$currentGame["bulk_wine"]++;
-				$newWineOrder--;
-			}
+			$choice += $itemPref;
 			
+			if($choice>=$choiceValue)
+			{
+				return $itemName;
+			}
 		}
+		
+		return null;
+	}
+	
+	function ServeDish($currentCustomer, $dishes)
+	{
+		global $currentGame;
+		
+		$served = false;
+		
+		while(!$served)
+		{
+			$dishName = $dishes[rand(0, count($dishes))];
+			
+			if(HaveIngredients($dishName))
+			{
+				
+			}
+		}
+	}
+
+	
+	function GetRecipeByName($dishName)
+	{
+		$db = Database::getInstance();
+		
+		$sql = "SELECT * FROM recipes WHERE name='${dishName}'";
+		return $db->query($sql)->fetch_assoc();
 	}
 	
 	function GetItemCostByName($name)
@@ -375,26 +389,18 @@
 		return $row["unit_cost"];
 	}
 	
-	function RecordDay()
+	function GetBulkItemCostByName($name)
 	{
-		global $currentGame;
-		
 		$db = Database::getInstance();
 		
-		$currentGame["tavern_date"]++;
+		$sql = "SELECT bulk_cost FROM items WHERE bulk_tag = '$name'";
+		$result = $db->query($sql);
+
+		$row = $result->fetch_assoc();
 		
-		foreach($currentGame as $key => $value)
-		{
-			$keys[] = $key;
-			$values[] = $value;
-		}
-		$keysImploded = implode("`, `", $keys);
-		$valuesImploded = implode(" , ", $values);
-		
-		$sql = "INSERT INTO games (`" . $keysImploded . "`) VALUES (" . $valuesImploded . ")";
-    
-		$db->query($sql);
+		return $row["bulk_cost"];
 	}
+
 
 
 	
@@ -508,74 +514,33 @@
 		
 		foreach($items as $item)
 		{
-			if($currentGame[$item['unit_tag']] == 0 && $currentGame[$item['bulk_tag']] > 0)
+			if($currentGame[$item["unit_tag"]] <= 0 && $currentGame[$item["bulk_tag"]] > 0)
 			{
-				$currentGame[$item['unit_tag']]--;
-				$currentGame[$itme["unit_tag"]] += $item['bulk_qty'];
-			}			
+				$currentGame[$item["bulk_tag"]] -= 1;
+				$currentGame[$item["unit_tag"]] += $item["bulk_qty"];
+			}
+			
 		}
 	}
-	
-	function GetRandomFirstName()
+		
+	function RecordDay()
 	{
+		global $currentGame;
+		
 		$db = Database::getInstance();
 		
-		$sql = "SELECT * FROM firstnames";
-		$names = $db->query($sql);
+		$currentGame["tavern_date"]++;
 		
-		$nameId =  rand(1 , mysqli_num_rows($names));
+		foreach($currentGame as $key => $value)
+		{
+			$keys[] = $key;
+			$values[] = $value;
+		}
+		$keysImploded = implode("`, `", $keys);
+		$valuesImploded = implode(" , ", $values);
 		
-		$sql = "SELECT first_name FROM firstnames WHERE (id = '$nameId')";
-		$name = $db->query($sql);
-		
-		$result = $name->fetch_assoc();
-		
-		return $result['first_name'];
+		$sql = "INSERT INTO games (`" . $keysImploded . "`) VALUES (" . $valuesImploded . ")";
+    	
+		$db->query($sql);
 	}
 	
-	function GetRandomLastName()
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT * FROM lastnames";
-		$names = $db->query($sql);
-		
-		$nameId =  rand(1 , mysqli_num_rows($names));
-		
-		$sql = "SELECT last_name FROM lastnames WHERE (id = '$nameId')";
-		$name = $db->query($sql);
-		
-		$result = $name->fetch_assoc();
-		
-		return $result['last_name'];
-	}
-	
-	function GetRandomDrinkerType()
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT * FROM drinkertypes";
-		$drinkerTypes = $db->query($sql);
-		
-		return rand(1 , mysqli_num_rows($drinkerTypes));
-	}
-	
-	function GetRandomEaterType()
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT * FROM eatertypes";
-		$eaterTypes = $db->query($sql);
-		
-		return rand(1 , mysqli_num_rows($eaterTypes));
-	}
-	
-	function GetRandomProfession()
-	{
-		$db = Database::getInstance();
-		
-		$sql = "SELECT * FROM professions";
-		$professions = $db->query($sql);
-		
-		return rand(1 , mysqli_num_rows($professions));
-	}
