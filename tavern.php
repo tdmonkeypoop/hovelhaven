@@ -77,7 +77,8 @@
     		<div class="ledger-card-title card-title middled centered">LEDGER</div>
 	    	<!--Cards-->
 	    	<div class="summary-card card">
-	    		Current Day:<br><?=FormatDate($currentGame["tavern_date"])?><br><br>
+	    		Current Day:<br><?=FormatDate($currentGame["tavern_date"])?><br>
+	    		Days To Shipment: <?= (6 - ($currentGame['tavern_date']-1) % 6)?><br><br>
 	    		Total Cash: $<?=$currentGame["current_money"]?><br><br>
 	    		&lt;-- Yesterday --><br>
 	    		Total Earned: $<?= $currentGame["current_money"] - $yesterdayGame["current_money"]?><br>
